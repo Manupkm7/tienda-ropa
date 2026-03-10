@@ -1,129 +1,237 @@
 ---
-import Layout from '../components/layout/Layout.astro';
+import Layout from "../components/layout/Layout.astro";
 
-const status = Astro.url.searchParams.get('status');
-const ordenId = Astro.url.searchParams.get('orden');
+const status = Astro.url.searchParams.get("status");
+const ordenId = Astro.url.searchParams.get("orden");
 ---
 
 <Layout title="Checkout" description="Completar compra">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12">
-
     <!-- Breadcrumb -->
-    <nav class="mb-8 flex gap-2 text-xs text-ash">
-      <a href="/" class="hover:text-ink transition-colors">Inicio</a>
+    <nav class="mb-8 flex gap-2 text-xs text-ash select-none">
+      <a href="/" class="hover:text-[#ff0000] transition-colors">Inicio</a>
       <span>/</span>
-      <a href="#" class="hover:text-ink transition-colors cursor-pointer" onclick="history.back()">Carrito</a>
+      <a
+        href="#"
+        class="hover:text-[#ff0000] transition-colors cursor-pointer"
+        onclick="history.back()">Carrito</a
+      >
       <span>/</span>
-      <span class="text-ink">Checkout</span>
+      <span class="text-[#ff0000]">Checkout</span>
     </nav>
 
-    {status === 'failed' && (
-      <div class="bg-rust/10 border border-rust/30 text-rust px-5 py-4 text-sm mb-8">
-        El pago no pudo procesarse. Intentá de nuevo o usá otro método de pago.
-      </div>
-    )}
+    {
+      status === "failed" && (
+        <div class="bg-[#ff0000]/10 border border-[#ff0000]/30 text-[#ff0000] px-5 py-4 text-sm mb-8">
+          El pago no pudo procesarse. Intentá de nuevo o usá otro método de
+          pago.
+        </div>
+      )
+    }
 
     <div id="checkout-app" class="grid grid-cols-1 lg:grid-cols-5 gap-12">
-
       <!-- Formulario (lado izquierdo) -->
       <div class="lg:col-span-3 space-y-10">
-
         <!-- Datos personales -->
         <section>
-          <h2 class="text-sm font-mono tracking-widest uppercase mb-6">01. Datos personales</h2>
+          <h2 class="text-sm font-mono tracking-widest uppercase mb-6 text-ash">
+            01. Datos personales
+          </h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="label-sm block mb-2">Nombre</label>
-              <input id="nombre" type="text" class="input-field" placeholder="Juan" required />
+              <label for="nombre" class="label-sm block mb-2 select-none">Nombre</label>
+              <input
+                id="nombre"
+                type="text"
+                class="input-field"
+                placeholder="Ingrese su nombre"
+                required
+              />
             </div>
             <div>
-              <label class="label-sm block mb-2">Apellido</label>
-              <input id="apellido" type="text" class="input-field" placeholder="García" required />
+              <label for="apellido" class="label-sm block mb-2 select-none">Apellido</label>
+              <input
+                id="apellido"
+                type="text"
+                class="input-field"
+                placeholder="Ingrese su apellido"
+                required
+              />
             </div>
             <div class="col-span-2">
-              <label class="label-sm block mb-2">Email</label>
-              <input id="email" type="email" class="input-field" placeholder="juan@email.com" required />
+              <label for="email" class="label-sm block mb-2 select-none">Email</label>
+              <input
+                id="email"
+                type="email"
+                class="input-field"
+                placeholder="Ingrese un email"
+                required
+              />
             </div>
             <div class="col-span-2">
-              <label class="label-sm block mb-2">Teléfono</label>
-              <input id="telefono" type="tel" class="input-field" placeholder="+54 11 1234-5678" />
+              <label for="telefono" class="label-sm block mb-2 select-none">Teléfono</label>
+              <input
+                id="telefono"
+                type="tel"
+                class="input-field"
+                placeholder="Ingrese un numero de telefono"
+              />
             </div>
           </div>
         </section>
 
         <!-- Dirección de envío -->
         <section>
-          <h2 class="text-sm font-mono tracking-widest uppercase mb-6">02. Dirección de envío</h2>
+          <h2 class="text-sm font-mono tracking-widest uppercase mb-6 text-ash">
+            02. Dirección de envío
+          </h2>
           <div class="grid grid-cols-6 gap-4">
             <div class="col-span-4">
-              <label class="label-sm block mb-2">Calle</label>
-              <input id="calle" type="text" class="input-field" placeholder="Av. Corrientes" required />
+              <label for="calle" class="label-sm block mb-2 select-none">Calle</label>
+              <input
+                id="calle"
+                type="text"
+                class="input-field"
+                placeholder="Av. Corrientes"
+                required
+              />
             </div>
             <div class="col-span-2">
-              <label class="label-sm block mb-2">Número</label>
-              <input id="numero" type="text" class="input-field" placeholder="1234" required />
+              <label for="numero" class="label-sm block mb-2 select-none">Número</label>
+              <input
+                id="numero"
+                type="text"
+                class="input-field"
+                placeholder="1234"
+                required
+              />
             </div>
             <div class="col-span-3">
-              <label class="label-sm block mb-2">Piso (opcional)</label>
-              <input id="piso" type="text" class="input-field" placeholder="3" />
+              <label for="piso" class="label-sm block mb-2 select-none"
+                >Piso (opcional)</label
+              >
+              <input
+                id="piso"
+                type="text"
+                class="input-field"
+                placeholder="3"
+              />
             </div>
             <div class="col-span-3">
-              <label class="label-sm block mb-2">Depto (opcional)</label>
-              <input id="depto" type="text" class="input-field" placeholder="B" />
+              <label for="depto" class="label-sm block mb-2 select-none"
+                >Depto (opcional)</label
+              >
+              <input
+                id="depto"
+                type="text"
+                class="input-field"
+                placeholder="B"
+              />
             </div>
             <div class="col-span-6">
-              <label class="label-sm block mb-2">Ciudad</label>
-              <input id="ciudad" type="text" class="input-field" placeholder="Buenos Aires" required />
+              <label for="ciudad" class="label-sm block mb-2 select-none">Ciudad</label>
+              <input
+                id="ciudad"
+                type="text"
+                class="input-field"
+                placeholder="Buenos Aires"
+                required
+              />
             </div>
             <div class="col-span-3">
-              <label class="label-sm block mb-2">Provincia</label>
+              <label for="provincia" class="label-sm block mb-2 select-none">Provincia</label>
               <select id="provincia" class="input-field" required>
                 <option value="">Seleccionar...</option>
-                {['Buenos Aires', 'CABA', 'Córdoba', 'Santa Fe', 'Mendoza', 'Tucumán',
-                  'Entre Ríos', 'Salta', 'Misiones', 'Chaco', 'Corrientes', 'Santiago del Estero',
-                  'San Juan', 'Jujuy', 'Río Negro', 'Neuquén', 'Formosa', 'Chubut',
-                  'San Luis', 'Catamarca', 'La Rioja', 'La Pampa', 'Santa Cruz', 'Tierra del Fuego'].map(p => (
-                  <option value={p}>{p}</option>
-                ))}
+                {
+                  [
+                    "Buenos Aires",
+                    "CABA",
+                    "Córdoba",
+                    "Santa Fe",
+                    "Mendoza",
+                    "Tucumán",
+                    "Entre Ríos",
+                    "Salta",
+                    "Misiones",
+                    "Chaco",
+                    "Corrientes",
+                    "Santiago del Estero",
+                    "San Juan",
+                    "Jujuy",
+                    "Río Negro",
+                    "Neuquén",
+                    "Formosa",
+                    "Chubut",
+                    "San Luis",
+                    "Catamarca",
+                    "La Rioja",
+                    "La Pampa",
+                    "Santa Cruz",
+                    "Tierra del Fuego",
+                  ].map((p) => <option value={p}>{p}</option>)
+                }
               </select>
             </div>
             <div class="col-span-3">
-              <label class="label-sm block mb-2">Código postal</label>
-              <input id="cp" type="text" class="input-field" placeholder="1414" maxlength="8" required />
+              <label for="cp" class="label-sm block mb-2 select-none"
+                >Código postal</label
+              >
+              <input
+                id="cp"
+                type="text"
+                class="input-field"
+                placeholder="1414"
+                maxlength="8"
+                required
+              />
             </div>
           </div>
         </section>
 
         <!-- Método de envío -->
         <section>
-          <h2 class="text-sm font-mono tracking-widest uppercase mb-2">03. Método de envío</h2>
-          <p class="text-xs text-ash mb-4">Completá tu dirección para calcular opciones de envío.</p>
+          <h2 class="text-sm font-mono tracking-widest uppercase mb-2 text-ash">
+            03. Método de envío
+          </h2>
+          <p class="text-xs text-ash mb-4">
+            Completá tu dirección para calcular opciones de envío.
+          </p>
           <div id="envios-container">
             <button
               id="btn-calcular-envio"
               type="button"
-              class="btn-outline text-sm px-6 py-2.5 w-full sm:w-auto"
+              class="btn-outline text-sm px-6 py-2.5 w-full sm:w-auto border-[#ff0000] hover:text-[#ff0000] text-ash"
             >
               Calcular envío
             </button>
-            <div id="envios-loading" class="hidden py-4 text-xs text-ash font-mono">Calculando...</div>
+            <div
+              id="envios-loading"
+              class="hidden py-4 text-xs text-ash font-mono"
+            >
+              Calculando...
+            </div>
             <div id="envios-opciones" class="space-y-2 mt-4 hidden"></div>
           </div>
         </section>
 
         <!-- Notas -->
         <section>
-          <h2 class="text-sm font-mono tracking-widest uppercase mb-4">04. Notas (opcional)</h2>
-          <textarea id="notas" rows="3" class="input-field resize-none"
-                    placeholder="Instrucciones especiales para la entrega..."></textarea>
+          <h2 class="text-sm font-mono tracking-widest uppercase mb-4 text-ash">
+            04. Notas (opcional)
+          </h2>
+          <textarea
+            id="notas"
+            rows="3"
+            class="input-field resize-none"
+            placeholder="Instrucciones especiales para la entrega..."
+          ></textarea>
         </section>
-
       </div>
 
       <!-- Resumen (lado derecho) -->
       <aside class="lg:col-span-2">
         <div class="sticky top-24 space-y-6">
-          <h2 class="text-sm font-mono tracking-widest uppercase">Resumen</h2>
+          <h2 class="text-sm font-mono tracking-widest uppercase text-ash select-none">Resumen</h2>
 
           <!-- Items del carrito (renderizado cliente) -->
           <div id="resumen-items" class="space-y-4 border-y border-dust py-4">
@@ -133,15 +241,17 @@ const ordenId = Astro.url.searchParams.get('orden');
           <!-- Totales -->
           <div class="space-y-2 text-sm">
             <div class="flex justify-between">
-              <span class="text-ash">Subtotal</span>
-              <span id="resumen-subtotal" class="font-mono">—</span>
+              <span class="text-ash select-none">Subtotal</span>
+              <span id="resumen-subtotal" class="font-mono text-[#ff0000]">—</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-ash">Envío</span>
-              <span id="resumen-envio" class="font-mono">—</span>
+              <span class="text-ash select-none">Envío</span>
+              <span id="resumen-envio" class="font-mono text-ash">—</span>
             </div>
-            <div class="flex justify-between pt-3 border-t border-dust font-medium">
-              <span>Total</span>
+            <div
+              class="flex justify-between pt-3 border-t border-dust font-medium"
+            >
+              <span class="select-none">Total</span>
               <span id="resumen-total" class="font-mono">—</span>
             </div>
           </div>
@@ -152,207 +262,293 @@ const ordenId = Astro.url.searchParams.get('orden');
             class="btn-primary w-full flex items-center justify-center gap-2"
             disabled
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect x="1" y="4" width="22" height="16" rx="2"></rect><line
+                x1="1"
+                y1="10"
+                x2="23"
+                y2="10"></line>
             </svg>
             Pagar con MercadoPago
           </button>
 
-          <p class="text-xs text-ash text-center">
-            Pago seguro con encriptación SSL. Aceptamos todos los medios de pago de MercadoPago.
+          <p class="text-xs text-ash text-center select-none">
+            Pago seguro con encriptación SSL. Aceptamos todos los medios de pago
+            de MercadoPago.
           </p>
 
-          <div class="flex justify-center gap-3 opacity-50">
-            <span class="text-xs font-mono">VISA</span>
-            <span class="text-xs font-mono">MASTER</span>
-            <span class="text-xs font-mono">AMEX</span>
-            <span class="text-xs font-mono">MP</span>
+          <div class="flex justify-center gap-3 opacity-80 border py-2 select-none">
+            <span class="text-xs font-mono text-ash">VISA</span>
+            <span class="text-xs font-mono text-[#ff0000]">MASTER</span>
+            <span class="text-xs font-mono text-ash">AMEX</span>
+            <span class="text-xs font-mono text-[#ff0000]">MP</span>
           </div>
         </div>
       </aside>
-
     </div>
   </div>
 </Layout>
 
 <script>
-  import { carrito, totalCarrito, pesoTotalCarrito } from '../store/carrito';
+  // @ts-nocheck
+  import { carrito, totalCarrito } from "../store/carrito";
 
-  const fmt = (n) => new Intl.NumberFormat('es-AR', {
-    style: 'currency', currency: 'ARS', maximumFractionDigits: 0
-  }).format(n);
+  const fmt = (n) =>
+    new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      maximumFractionDigits: 0,
+    }).format(n);
 
   let envioSeleccionado = null;
   let enviosCotizados = [];
+
+  function getFieldValue(id: string): string {
+    const el = document.getElementById(id) as
+      | HTMLInputElement
+      | HTMLSelectElement
+      | HTMLTextAreaElement
+      | null;
+    return el?.value.trim() ?? "";
+  }
 
   // Renderizar items del carrito
   function renderResumen() {
     const items = carrito.get();
     const subtotal = totalCarrito.get();
-    const container = document.getElementById('resumen-items');
+    const container = document.getElementById("resumen-items");
     if (!container) return;
 
     if (items.length === 0) {
-      container.innerHTML = '<p class="text-xs text-ash">El carrito está vacío</p>';
-      document.getElementById('btn-pagar').disabled = true;
+      container.innerHTML =
+        '<p class="text-xs text-ash">El carrito está vacío</p>';
+      const btnPagar = document.getElementById("btn-pagar");
+      if (btnPagar) {
+        btnPagar.disabled = true;
+      }
       return;
     }
 
-    container.innerHTML = items.map(item => `
+    container.innerHTML = items
+      .map(
+        (item) => `
       <div class="flex gap-3">
         <div class="w-14 h-16 bg-dust flex-shrink-0 overflow-hidden">
-          <img src="${item.imagen || '/images/placeholder.jpg'}" alt="${item.nombre}"
+          <img src="${item.imagen || "/images/placeholder.jpg"}" alt="${item.nombre}"
                class="w-full h-full object-cover" />
         </div>
-        <div class="flex-1">
-          <p class="text-xs leading-tight">${item.nombre}</p>
-          <p class="text-xs text-ash mt-0.5">${[item.color, item.talla].filter(Boolean).join(' / ')}</p>
+        <div class="flex-1 select-none">
+          <p class="text-xs leading-tight text-[#ff0000]">${item.nombre}</p>
+          <p class="text-xs text-ash mt-0.5">${[item.color, item.talla].filter(Boolean).join(" / ")}</p>
           <div class="flex justify-between mt-1">
             <span class="text-xs text-ash">×${item.cantidad}</span>
             <span class="text-xs font-mono">${fmt(item.precio * item.cantidad)}</span>
           </div>
         </div>
       </div>
-    `).join('');
+    `,
+      )
+      .join("");
 
-    document.getElementById('resumen-subtotal').textContent = fmt(subtotal);
+    const subtotalEl = document.getElementById("resumen-subtotal");
+    if (subtotalEl) {
+      subtotalEl.textContent = fmt(subtotal);
+    }
     actualizarTotal();
   }
 
   function actualizarTotal() {
     const subtotal = totalCarrito.get();
     const costoEnvio = envioSeleccionado?.precio ?? 0;
-    document.getElementById('resumen-envio').textContent = costoEnvio === 0
-      ? (envioSeleccionado ? 'Gratis' : 'A calcular')
-      : fmt(costoEnvio);
-    document.getElementById('resumen-total').textContent = fmt(subtotal + costoEnvio);
+    const envioEl = document.getElementById("resumen-envio");
+    const totalEl = document.getElementById("resumen-total");
+    if (envioEl) {
+      envioEl.textContent =
+        costoEnvio === 0
+          ? envioSeleccionado
+            ? "Gratis"
+            : "A calcular"
+          : fmt(costoEnvio);
+    }
+    if (totalEl) {
+      totalEl.textContent = fmt(subtotal + costoEnvio);
+    }
   }
 
   carrito.subscribe(renderResumen);
 
   // Calcular envío
-  document.getElementById('btn-calcular-envio')?.addEventListener('click', async () => {
-    const cp = document.getElementById('cp').value.trim();
-    const provincia = document.getElementById('provincia').value;
-    const ciudad = document.getElementById('ciudad').value.trim();
+  document
+    .getElementById("btn-calcular-envio")
+    ?.addEventListener("click", async () => {
+      const cp = getFieldValue("cp");
+      const provincia = getFieldValue("provincia");
+      const ciudad = getFieldValue("ciudad");
 
-    if (!cp || cp.length < 4) {
-      alert('Completá el código postal para calcular el envío');
-      return;
-    }
+      if (!cp || cp.length < 4) {
+        alert("Completá el código postal para calcular el envío");
+        return;
+      }
 
-    const loading = document.getElementById('envios-loading');
-    const opciones = document.getElementById('envios-opciones');
-    loading.classList.remove('hidden');
-    opciones.classList.add('hidden');
+      const loading = document.getElementById("envios-loading");
+      const opciones = document.getElementById("envios-opciones");
+      if (!loading || !opciones) return;
+      loading.classList.remove("hidden");
+      opciones.classList.add("hidden");
 
-    const items = carrito.get();
-    try {
-      const res = await fetch('/api/envios/cotizar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          destino: { codigoPostal: cp, localidad: ciudad, provincia, calle: '', numero: '' },
-          items: items.map(i => ({ pesoKg: i.pesoKg ?? 0.3, cantidad: i.cantidad })),
-        }),
-      });
-      enviosCotizados = await res.json();
-    } catch {
-      enviosCotizados = [{ id: 'estimado', descripcion: 'Envío estándar (estimado)', precio: 3500, diasEstimados: 5 }];
-    }
+      const items = carrito.get();
+      try {
+        const res = await fetch("/api/envios/cotizar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            destino: {
+              codigoPostal: cp,
+              localidad: ciudad,
+              provincia,
+              calle: "",
+              numero: "",
+            },
+            items: items.map((i) => ({
+              pesoKg: i.pesoKg ?? 0.3,
+              cantidad: i.cantidad,
+            })),
+          }),
+        });
+        enviosCotizados = await res.json();
+      } catch {
+        enviosCotizados = [
+          {
+            id: "estimado",
+            descripcion: "Envío estándar (estimado)",
+            precio: 3500,
+            diasEstimados: 5,
+          },
+        ];
+      }
 
-    loading.classList.add('hidden');
-    opciones.classList.remove('hidden');
-    opciones.innerHTML = enviosCotizados.map((op, i) => `
+      loading.classList.add("hidden");
+      opciones.classList.remove("hidden");
+      opciones.innerHTML = enviosCotizados
+        .map(
+          (op, i) => `
       <label class="flex items-start gap-3 border border-dust p-3 cursor-pointer hover:border-ink transition-colors has-[:checked]:border-ink has-[:checked]:bg-ink/5">
-        <input type="radio" name="envio" value="${i}" class="mt-0.5" ${i === 0 ? 'checked' : ''} />
+        <input type="radio" name="envio" value="${i}" class="mt-0.5" ${i === 0 ? "checked" : ""} />
         <div class="flex-1">
           <p class="text-sm">${op.descripcion}</p>
-          <p class="text-xs text-ash mt-0.5">${op.diasEstimados === 0 ? 'Inmediato' : `${op.diasEstimados} días hábiles`}</p>
+          <p class="text-xs text-ash mt-0.5">${op.diasEstimados === 0 ? "Inmediato" : `${op.diasEstimados} días hábiles`}</p>
         </div>
-        <span class="text-sm font-mono flex-shrink-0">${op.precio === 0 ? 'Gratis' : fmt(op.precio)}</span>
+        <span class="text-sm font-mono flex-shrink-0">${op.precio === 0 ? "Gratis" : fmt(op.precio)}</span>
       </label>
-    `).join('');
+    `,
+        )
+        .join("");
 
-    // Seleccionar primera opción por defecto
-    if (enviosCotizados.length > 0) {
-      envioSeleccionado = enviosCotizados[0];
-      actualizarTotal();
-      document.getElementById('btn-pagar').disabled = false;
-    }
-
-    // Escuchar cambio de opción
-    opciones.querySelectorAll('input[type=radio]').forEach(r => {
-      r.addEventListener('change', () => {
-        envioSeleccionado = enviosCotizados[parseInt(r.value)];
+      // Seleccionar primera opción por defecto
+      if (enviosCotizados.length > 0) {
+        envioSeleccionado = enviosCotizados[0];
         actualizarTotal();
-      });
+        const btnPagar = document.getElementById("btn-pagar");
+        if (btnPagar) {
+          btnPagar.disabled = false;
+        }
+      }
+
+      // Escuchar cambio de opción
+      opciones
+        .querySelectorAll('input[type="radio"]')
+        .forEach((r) => {
+          r.addEventListener("change", () => {
+            const index = parseInt(r.value, 10);
+            envioSeleccionado = enviosCotizados[index] ?? null;
+            actualizarTotal();
+          });
+        });
     });
-  });
 
   // Pagar
-  document.getElementById('btn-pagar')?.addEventListener('click', async () => {
-    const btn = document.getElementById('btn-pagar');
+  document.getElementById("btn-pagar")?.addEventListener("click", async () => {
+    const btn = document.getElementById("btn-pagar");
     const items = carrito.get();
 
-    if (items.length === 0) return alert('El carrito está vacío');
+    if (items.length === 0) return alert("El carrito está vacío");
 
     // Validar campos
-    const campos = ['nombre', 'apellido', 'email', 'calle', 'numero', 'ciudad', 'provincia', 'cp'];
-    const faltantes = campos.filter(id => !document.getElementById(id)?.value?.trim());
-    if (faltantes.length > 0) return alert('Completá todos los campos obligatorios');
+    const campos = [
+      "nombre",
+      "apellido",
+      "email",
+      "calle",
+      "numero",
+      "ciudad",
+      "provincia",
+      "cp",
+    ];
+    const faltantes = campos.filter((id) => !getFieldValue(id));
+    if (faltantes.length > 0)
+      return alert("Completá todos los campos obligatorios");
 
-    btn.disabled = true;
-    btn.textContent = 'Procesando...';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Procesando...";
+    }
 
     const cliente = {
-      nombre: document.getElementById('nombre').value.trim(),
-      apellido: document.getElementById('apellido').value.trim(),
-      email: document.getElementById('email').value.trim(),
-      telefono: document.getElementById('telefono').value.trim(),
+      nombre: getFieldValue("nombre"),
+      apellido: getFieldValue("apellido"),
+      email: getFieldValue("email"),
+      telefono: getFieldValue("telefono"),
       direccionEnvio: {
-        calle: document.getElementById('calle').value.trim(),
-        numero: document.getElementById('numero').value.trim(),
-        piso: document.getElementById('piso').value.trim() || undefined,
-        depto: document.getElementById('depto').value.trim() || undefined,
-        ciudad: document.getElementById('ciudad').value.trim(),
-        provincia: document.getElementById('provincia').value,
-        codigoPostal: document.getElementById('cp').value.trim(),
-        pais: 'Argentina',
+        calle: getFieldValue("calle"),
+        numero: getFieldValue("numero"),
+        piso: getFieldValue("piso") || undefined,
+        depto: getFieldValue("depto") || undefined,
+        ciudad: getFieldValue("ciudad"),
+        provincia: getFieldValue("provincia"),
+        codigoPostal: getFieldValue("cp"),
+        pais: "Argentina",
       },
     };
 
     try {
-      const res = await fetch('/api/checkout/crear-preferencia', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/checkout/crear-preferencia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: items.map(i => ({
+          items: items.map((i) => ({
             id: String(i.productoId),
-            title: `${i.nombre}${i.color ? ` - ${i.color}` : ''}${i.talla ? ` / ${i.talla}` : ''}`,
+            title: `${i.nombre}${i.color ? ` - ${i.color}` : ""}${i.talla ? ` / ${i.talla}` : ""}`,
             quantity: i.cantidad,
             unit_price: i.precio,
             picture_url: i.imagen,
           })),
           cliente,
           envio: envioSeleccionado,
-          notas: document.getElementById('notas').value.trim(),
+          notas: getFieldValue("notas"),
         }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error ?? 'Error al crear preferencia');
+      if (!res.ok) throw new Error(data.error ?? "Error al crear preferencia");
 
       // Redirigir a MercadoPago
       const url = import.meta.env.DEV ? data.sandboxInitPoint : data.initPoint;
       window.location.href = url ?? data.initPoint;
-
     } catch (err) {
       console.error(err);
-      btn.disabled = false;
-      btn.textContent = 'Pagar con MercadoPago';
-      alert('Error al procesar el pago. Intentá de nuevo.');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Pagar con MercadoPago";
+      }
+      alert("Error al procesar el pago. Intentá de nuevo.");
     }
   });
 </script>
