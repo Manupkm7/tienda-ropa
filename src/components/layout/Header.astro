@@ -1,12 +1,12 @@
 ---
-import CarritoIcon from '../carrito/CarritoIcon';
-import { getClienteFromCookies } from '../../lib/userAuth';
+import CarritoIcon from "../carrito/CarritoIcon";
+import { getClienteFromCookies } from "../../lib/userAuth";
 
 const nav = [
-  { href: '/productos', label: 'Catálogo' },
-  { href: '/productos?categoria=remeras', label: 'Remeras' },
-  { href: '/productos?categoria=pantalones', label: 'Pantalones' },
-  { href: '/productos?categoria=camperas', label: 'Camperas' },
+  { href: "/productos", label: "Catálogo" },
+  { href: "/productos?categoria=remeras", label: "Remeras" },
+  { href: "/productos?categoria=pantalones", label: "Pantalones" },
+  { href: "/productos?categoria=camperas", label: "Camperas" },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -16,52 +16,83 @@ const cliente = await getClienteFromCookies(Astro.cookies);
 <header class="sticky top-0 z-30 bg-ink border-b border-[#ff0000]">
   <div class="max-w-7xl mx-auto px-6 py-4">
     <div class="flex items-center justify-between h-14">
-
-      <!-- Logo -->
-      <a href="/" class="flex items-center gap-2 group">
-        <h1 class="text-lg font-semibold tracking-[0.25em] uppercase text-white">
-          T<span class="text-[#ff0000]">I</span>ENDA
-        </h1>
-      </a>
-
-      <!-- Nav desktop -->
-      <nav class="hidden md:flex items-center gap-8">
-        {nav.map(({ href, label }) => (
-          <a
-            href={href}
-            class={`text-xs tracking-widest uppercase transition-colors duration-150 ${
-              currentPath.startsWith(href.split('?')[0])
-                ? 'text-[#ff0000]'
-                : 'text-ash hover:text-[#ff0000]'
-            }`}
+      <div class="flex items-center gap-6">
+        <a href="/" class="flex items-center gap-2">
+          <h1
+            class="text-lg font-semibold tracking-[0.25em] uppercase text-white"
           >
-            {label}
-          </a>
-        ))}
-      </nav>
+            T<span class="text-[#ff0000]">I</span>ENDA
+          </h1>
+        </a>
+        <!-- Nav desktop -->
+        <nav class="hidden md:flex items-center gap-8">
+          {
+            nav.map(({ href, label }) => (
+              <a
+                href={href}
+                class={`text-xs tracking-widest uppercase transition-colors duration-150 ${
+                  currentPath.startsWith(href.split("?")[0])
+                    ? "text-[#ff0000]"
+                    : "text-ash hover:text-[#ff0000]"
+                }`}
+              >
+                {label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
 
       <!-- Acciones -->
       <div class="flex items-center gap-4">
-        <a href="/productos" class="text-ash hover:text-[#ff0000] transition-colors" aria-label="Buscar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        <a
+          href="/productos"
+          class="text-ash hover:text-[#ff0000] transition-colors"
+          aria-label="Buscar"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"
+            ></path>
           </svg>
         </a>
 
         <!-- Cuenta de usuario -->
         <a
-          href={cliente ? '/cuenta' : '/cuenta/login'}
+          href={cliente ? "/cuenta" : "/cuenta/login"}
           class="text-ash hover:text-[#ff0000] transition-colors relative"
-          aria-label={cliente ? `Mi cuenta (${cliente.nombre})` : 'Iniciar sesión'}
-          title={cliente ? `${cliente.nombre} ${cliente.apellido}` : 'Iniciar sesión'}
+          aria-label={cliente
+            ? `Mi cuenta (${cliente.nombre})`
+            : "Iniciar sesión"}
+          title={cliente
+            ? `${cliente.nombre} ${cliente.apellido}`
+            : "Iniciar sesión"}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          {cliente && (
-            <span class="absolute -top-1 -right-1 w-2 h-2 bg-[#ff0000] rounded-full" title="Sesión activa" />
-          )}
+          {
+            cliente && (
+              <span
+                class="absolute -top-1 -right-1 w-2 h-2 bg-[#ff0000] rounded-full"
+                title="Sesión activa"
+              />
+            )
+          }
         </a>
 
         <!-- Carrito icon — React island para contador reactivo -->
@@ -73,28 +104,43 @@ const cliente = await getClienteFromCookies(Astro.cookies);
           class="md:hidden text-ash hover:text-ink transition-colors"
           aria-label="Menú"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
       </div>
     </div>
 
     <!-- Nav mobile -->
-    <nav id="mobile-menu" class="hidden md:hidden pb-4 space-y-3 border-t border-dust pt-4">
-      {nav.map(({ href, label }) => (
-        <a href={href} class="block text-xs tracking-widest uppercase text-ash hover:text-ink transition-colors">
-          {label}
-        </a>
-      ))}
+    <nav
+      id="mobile-menu"
+      class="hidden md:hidden pb-4 space-y-3 border-t border-dust pt-4"
+    >
+      {
+        nav.map(({ href, label }) => (
+          <a
+            href={href}
+            class="block text-xs tracking-widest uppercase text-ash hover:text-ink transition-colors"
+          >
+            {label}
+          </a>
+        ))
+      }
     </nav>
   </div>
 </header>
 
 <script>
-  const toggle = document.getElementById('menu-toggle');
-  const menu = document.getElementById('mobile-menu');
-  toggle?.addEventListener('click', () => menu?.classList.toggle('hidden'));
+  const toggle = document.getElementById("menu-toggle");
+  const menu = document.getElementById("mobile-menu");
+  toggle?.addEventListener("click", () => menu?.classList.toggle("hidden"));
 </script>

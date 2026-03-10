@@ -1,57 +1,81 @@
 ---
-import CuentaLayout from '../../components/layout/CuentaLayout.astro';
-import { getClienteFromCookies } from '../../lib/userAuth';
+import CuentaLayout from "../../components/layout/CuentaLayout.astro";
+import { getClienteFromCookies } from "../../lib/userAuth";
 
 const cliente = await getClienteFromCookies(Astro.cookies);
-if (!cliente) return Astro.redirect('/cuenta/login?next=/cuenta/perfil');
+if (!cliente) return Astro.redirect("/cuenta/login?next=/cuenta/perfil");
 
-const success = Astro.url.searchParams.get('success');
-const error = Astro.url.searchParams.get('error');
+const success = Astro.url.searchParams.get("success");
+const error = Astro.url.searchParams.get("error");
 
 const dir = cliente.direccionEnvio;
 ---
 
 <CuentaLayout title="Mi perfil">
-
-  {success === 'guardado' && (
-    <div class="border border-green-200 bg-green-50 text-green-700 text-sm px-4 py-3 mb-6">
-      ✓ Perfil actualizado correctamente
-    </div>
-  )}
-  {error && (
-    <div class="border border-rust/30 bg-rust/5 text-rust text-sm px-4 py-3 mb-6">
-      Error al guardar. Intentá de nuevo.
-    </div>
-  )}
+  {
+    success === "guardado" && (
+      <div class="border border-green-200 bg-green-50 text-green-700 text-sm px-4 py-3 mb-6">
+        ✓ Perfil actualizado correctamente
+      </div>
+    )
+  }
+  {
+    error && (
+      <div class="border border-rust/30 bg-rust/5 text-rust text-sm px-4 py-3 mb-6">
+        Error al guardar. Intentá de nuevo.
+      </div>
+    )
+  }
 
   <form method="POST" action="/api/auth/perfil" class="space-y-10 max-w-2xl">
-
     <!-- Datos personales -->
     <section>
       <h2 class="label-sm mb-6">Datos personales</h2>
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="label-sm block mb-2">Nombre</label>
-          <input name="nombre" type="text" class="input-field" required value={cliente.nombre} />
+          <input
+            name="nombre"
+            type="text"
+            class="input-field"
+            required
+            value={cliente.nombre}
+          />
         </div>
         <div>
           <label class="label-sm block mb-2">Apellido</label>
-          <input name="apellido" type="text" class="input-field" required value={cliente.apellido} />
+          <input
+            name="apellido"
+            type="text"
+            class="input-field"
+            required
+            value={cliente.apellido}
+          />
         </div>
         <div class="col-span-2">
           <label class="label-sm block mb-2">Email</label>
-          <input type="email" class="input-field opacity-50 cursor-not-allowed"
-                 value={cliente.email} disabled title="El email no se puede modificar" />
+          <input
+            type="email"
+            class="input-field opacity-50 cursor-not-allowed"
+            value={cliente.email}
+            disabled
+            title="El email no se puede modificar"
+          />
           <p class="text-xs text-ash mt-1">El email no puede modificarse.</p>
         </div>
         <div class="col-span-2">
           <label class="label-sm block mb-2">Teléfono</label>
-          <input name="telefono" type="tel" class="input-field" value={cliente.telefono ?? ''} />
+          <input
+            name="telefono"
+            type="tel"
+            class="input-field"
+            value={cliente.telefono ?? ""}
+          />
         </div>
       </div>
     </section>
 
-    <div class="divider" />
+    <div class="divider"></div>
 
     <!-- Dirección de envío -->
     <section>
@@ -59,53 +83,110 @@ const dir = cliente.direccionEnvio;
       <div class="grid grid-cols-6 gap-4">
         <div class="col-span-4">
           <label class="label-sm block mb-2">Calle</label>
-          <input name="calle" type="text" class="input-field" value={dir?.calle ?? ''} />
+          <input
+            name="calle"
+            type="text"
+            class="input-field"
+            value={dir?.calle ?? ""}
+          />
         </div>
         <div class="col-span-2">
           <label class="label-sm block mb-2">Número</label>
-          <input name="numero" type="text" class="input-field" value={dir?.numero ?? ''} />
+          <input
+            name="numero"
+            type="text"
+            class="input-field"
+            value={dir?.numero ?? ""}
+          />
         </div>
         <div class="col-span-3">
           <label class="label-sm block mb-2">Piso</label>
-          <input name="piso" type="text" class="input-field" value={dir?.piso ?? ''} />
+          <input
+            name="piso"
+            type="text"
+            class="input-field"
+            value={dir?.piso ?? ""}
+          />
         </div>
         <div class="col-span-3">
           <label class="label-sm block mb-2">Depto</label>
-          <input name="depto" type="text" class="input-field" value={dir?.depto ?? ''} />
+          <input
+            name="depto"
+            type="text"
+            class="input-field"
+            value={dir?.depto ?? ""}
+          />
         </div>
         <div class="col-span-6">
           <label class="label-sm block mb-2">Ciudad</label>
-          <input name="ciudad" type="text" class="input-field" value={dir?.ciudad ?? ''} />
+          <input
+            name="ciudad"
+            type="text"
+            class="input-field"
+            value={dir?.ciudad ?? ""}
+          />
         </div>
         <div class="col-span-3">
           <label class="label-sm block mb-2">Provincia</label>
           <select name="provincia" class="input-field">
             <option value="">Seleccionar...</option>
-            {['Buenos Aires', 'CABA', 'Córdoba', 'Santa Fe', 'Mendoza', 'Tucumán',
-              'Entre Ríos', 'Salta', 'Misiones', 'Chaco', 'Corrientes', 'Santiago del Estero',
-              'San Juan', 'Jujuy', 'Río Negro', 'Neuquén', 'Formosa', 'Chubut',
-              'San Luis', 'Catamarca', 'La Rioja', 'La Pampa', 'Santa Cruz', 'Tierra del Fuego'].map(p => (
-              <option value={p} selected={dir?.provincia === p}>{p}</option>
-            ))}
+            {
+              [
+                "Buenos Aires",
+                "CABA",
+                "Córdoba",
+                "Santa Fe",
+                "Mendoza",
+                "Tucumán",
+                "Entre Ríos",
+                "Salta",
+                "Misiones",
+                "Chaco",
+                "Corrientes",
+                "Santiago del Estero",
+                "San Juan",
+                "Jujuy",
+                "Río Negro",
+                "Neuquén",
+                "Formosa",
+                "Chubut",
+                "San Luis",
+                "Catamarca",
+                "La Rioja",
+                "La Pampa",
+                "Santa Cruz",
+                "Tierra del Fuego",
+              ].map((p) => (
+                <option value={p} selected={dir?.provincia === p}>
+                  {p}
+                </option>
+              ))
+            }
           </select>
         </div>
         <div class="col-span-3">
           <label class="label-sm block mb-2">Código postal</label>
-          <input name="codigoPostal" type="text" class="input-field" value={dir?.codigoPostal ?? ''} maxlength="8" />
+          <input
+            name="codigoPostal"
+            type="text"
+            class="input-field"
+            value={dir?.codigoPostal ?? ""}
+            maxlength="8"
+          />
         </div>
       </div>
     </section>
 
     <button type="submit" class="btn-primary">Guardar cambios</button>
-
   </form>
 
-  <div class="divider" />
+  <div class="divider"></div>
 
   <!-- Cambiar contraseña (enlace a formulario dedicado) -->
   <div class="max-w-2xl">
     <h2 class="label-sm mb-4">Seguridad</h2>
-    <a href="/cuenta/cambiar-password" class="btn-outline inline-block">Cambiar contraseña</a>
+    <a href="/cuenta/cambiar-password" class="btn-outline inline-block"
+      >Cambiar contraseña</a
+    >
   </div>
-
 </CuentaLayout>

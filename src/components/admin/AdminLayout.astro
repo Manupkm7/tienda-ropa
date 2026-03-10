@@ -1,8 +1,8 @@
 ---
-import { getAdminFromCookies } from '../../lib/auth';
+import { getAdminFromCookies } from "../../lib/auth";
 
 const admin = await getAdminFromCookies(Astro.cookies);
-if (!admin) return Astro.redirect('/admin/login');
+if (!admin) return Astro.redirect("/admin/login");
 
 interface Props {
   title: string;
@@ -10,131 +10,280 @@ interface Props {
 const { title } = Astro.props;
 
 const nav = [
-  { href: '/admin', label: 'Dashboard', icon: '○' },
-  { href: '/admin/productos', label: 'Productos', icon: '□' },
-  { href: '/admin/ordenes', label: 'Órdenes', icon: '△' },
-  { href: '/admin/clientes', label: 'Clientes', icon: '◇' },
-  { href: '/admin/categorias', label: 'Categorías', icon: '⬡' },
+  { href: "/admin", label: "Dashboard", icon: "○" },
+  { href: "/admin/productos", label: "Productos", icon: "□" },
+  { href: "/admin/ordenes", label: "Órdenes", icon: "△" },
+  { href: "/admin/clientes", label: "Clientes", icon: "◇" },
+  { href: "/admin/categorias", label: "Categorías", icon: "⬡" },
 ];
 
 const currentPath = Astro.url.pathname;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title} — Admin</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; }
-    body {
-      background: #0D0D0D; color: #F5F2ED;
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      min-height: 100vh; display: flex; font-size: 13px;
-    }
-    .sidebar {
-      width: 220px; flex-shrink: 0; border-right: 1px solid #1a1a1a;
-      padding: 24px 0; display: flex; flex-direction: column;
-      position: sticky; top: 0; height: 100vh;
-    }
-    .sidebar-logo {
-      padding: 0 24px 24px; font-size: 10px; letter-spacing: 0.25em;
-      text-transform: uppercase; color: #333; border-bottom: 1px solid #1a1a1a; margin-bottom: 16px;
-    }
-    .nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 24px; color: #555; text-decoration: none;
-      transition: color 0.15s, background 0.15s; font-size: 12px; letter-spacing: 0.05em;
-    }
-    .nav-item:hover { color: #F5F2ED; background: #111; }
-    .nav-item.active { color: #F5F2ED; background: #161616; }
-    .nav-icon { font-size: 11px; width: 16px; text-align: center; }
-    .sidebar-footer {
-      margin-top: auto; padding: 16px 24px; border-top: 1px solid #1a1a1a;
-      font-size: 11px; color: #333;
-    }
-    .main { flex: 1; overflow-y: auto; }
-    .topbar {
-      border-bottom: 1px solid #1a1a1a; padding: 16px 32px;
-      display: flex; justify-content: justify-between; align-items: center;
-      position: sticky; top: 0; background: #0D0D0D; z-index: 10;
-    }
-    .topbar h1 { font-size: 15px; font-weight: 400; }
-    .content { padding: 32px; }
-    a { color: inherit; text-decoration: none; }
-    .btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 16px; font-size: 11px; letter-spacing: 0.1em;
-      text-transform: uppercase; cursor: pointer; font-family: inherit;
-      transition: all 0.15s; border: none;
-    }
-    .btn-sm { padding: 6px 12px; font-size: 10px; }
-    .btn-primary { background: #F5F2ED; color: #0D0D0D; }
-    .btn-primary:hover { background: #C4522A; color: #F5F2ED; }
-    .btn-ghost { background: transparent; color: #555; border: 1px solid #222; }
-    .btn-ghost:hover { border-color: #555; color: #F5F2ED; }
-    .btn-danger { background: rgba(196,82,42,0.15); color: #C4522A; border: 1px solid rgba(196,82,42,0.3); }
-    .badge {
-      display: inline-block; padding: 2px 8px; font-size: 10px;
-      letter-spacing: 0.05em; font-family: monospace;
-    }
-    .badge-pendiente { background: rgba(180,140,0,0.15); color: #b49a00; }
-    .badge-pagado { background: rgba(0,160,80,0.15); color: #00a050; }
-    .badge-enviado { background: rgba(0,100,200,0.15); color: #0080cc; }
-    .badge-cancelado { background: rgba(196,82,42,0.15); color: #C4522A; }
-    .badge-procesando { background: rgba(120,80,200,0.15); color: #8050cc; }
-    .badge-entregado { background: rgba(0,160,80,0.15); color: #00a050; }
-    table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; padding: 10px 12px; font-size: 10px; letter-spacing: 0.1em;
-         text-transform: uppercase; color: #333; border-bottom: 1px solid #1a1a1a; font-weight: 400; }
-    td { padding: 12px 12px; border-bottom: 1px solid #111; color: #aaa; vertical-align: middle; }
-    tr:hover td { background: #0f0f0f; }
-    .input {
-      background: transparent; border: 1px solid #222; color: #F5F2ED;
-      padding: 8px 12px; font-size: 13px; outline: none; font-family: inherit;
-      transition: border-color 0.15s; width: 100%;
-    }
-    .input:focus { border-color: #555; }
-    .card { background: #111; border: 1px solid #1a1a1a; padding: 20px 24px; }
-    .stat-value { font-size: 28px; font-weight: 300; margin-bottom: 4px; }
-    .stat-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #444; }
-  </style>
-</head>
-<body>
-  <!-- Sidebar -->
-  <nav class="sidebar">
-    <div class="sidebar-logo">TIENDA / ADMIN</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — Admin</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        background: #0d0d0d;
+        color: #f5f2ed;
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        font-size: 13px;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        border-right: 1px solid #1a1a1a;
+        padding: 24px 0;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
+      .sidebar-logo {
+        padding: 0 24px 24px;
+        font-size: 10px;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: #333;
+        border-bottom: 1px solid #1a1a1a;
+        margin-bottom: 16px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 24px;
+        color: #555;
+        text-decoration: none;
+        transition:
+          color 0.15s,
+          background 0.15s;
+        font-size: 12px;
+        letter-spacing: 0.05em;
+      }
+      .nav-item:hover {
+        color: #f5f2ed;
+        background: #111;
+      }
+      .nav-item.active {
+        color: #f5f2ed;
+        background: #161616;
+      }
+      .nav-icon {
+        font-size: 11px;
+        width: 16px;
+        text-align: center;
+      }
+      .sidebar-footer {
+        margin-top: auto;
+        padding: 16px 24px;
+        border-top: 1px solid #1a1a1a;
+        font-size: 11px;
+        color: #333;
+      }
+      .main {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .topbar {
+        border-bottom: 1px solid #1a1a1a;
+        padding: 16px 32px;
+        display: flex;
+        justify-content: justify-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: #0d0d0d;
+        z-index: 10;
+      }
+      .topbar h1 {
+        font-size: 15px;
+        font-weight: 400;
+      }
+      .content {
+        padding: 32px;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.15s;
+        border: none;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 10px;
+      }
+      .btn-primary {
+        background: #f5f2ed;
+        color: #0d0d0d;
+      }
+      .btn-primary:hover {
+        background: #c4522a;
+        color: #f5f2ed;
+      }
+      .btn-ghost {
+        background: transparent;
+        color: #555;
+        border: 1px solid #222;
+      }
+      .btn-ghost:hover {
+        border-color: #555;
+        color: #f5f2ed;
+      }
+      .btn-danger {
+        background: rgba(196, 82, 42, 0.15);
+        color: #c4522a;
+        border: 1px solid rgba(196, 82, 42, 0.3);
+      }
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 10px;
+        letter-spacing: 0.05em;
+        font-family: monospace;
+      }
+      .badge-pendiente {
+        background: rgba(180, 140, 0, 0.15);
+        color: #b49a00;
+      }
+      .badge-pagado {
+        background: rgba(0, 160, 80, 0.15);
+        color: #00a050;
+      }
+      .badge-enviado {
+        background: rgba(0, 100, 200, 0.15);
+        color: #0080cc;
+      }
+      .badge-cancelado {
+        background: rgba(196, 82, 42, 0.15);
+        color: #c4522a;
+      }
+      .badge-procesando {
+        background: rgba(120, 80, 200, 0.15);
+        color: #8050cc;
+      }
+      .badge-entregado {
+        background: rgba(0, 160, 80, 0.15);
+        color: #00a050;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        text-align: left;
+        padding: 10px 12px;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #333;
+        border-bottom: 1px solid #1a1a1a;
+        font-weight: 400;
+      }
+      td {
+        padding: 12px 12px;
+        border-bottom: 1px solid #111;
+        color: #aaa;
+        vertical-align: middle;
+      }
+      tr:hover td {
+        background: #0f0f0f;
+      }
+      .input {
+        background: transparent;
+        border: 1px solid #222;
+        color: #f5f2ed;
+        padding: 8px 12px;
+        font-size: 13px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.15s;
+        width: 100%;
+      }
+      .input:focus {
+        border-color: #555;
+      }
+      .card {
+        background: #111;
+        border: 1px solid #1a1a1a;
+        padding: 20px 24px;
+      }
+      .stat-value {
+        font-size: 28px;
+        font-weight: 300;
+        margin-bottom: 4px;
+      }
+      .stat-label {
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #444;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-logo">TIENDA / ADMIN</div>
 
-    {nav.map(({ href, label, icon }) => (
-      <a
-        href={href}
-        class={`nav-item ${currentPath === href ? 'active' : ''}`}
-      >
-        <span class="nav-icon">{icon}</span>
-        {label}
-      </a>
-    ))}
+      {
+        nav.map(({ href, label, icon }) => (
+          <a
+            href={href}
+            class={`nav-item ${currentPath === href ? "active" : ""}`}
+          >
+            <span class="nav-icon">{icon}</span>
+            {label}
+          </a>
+        ))
+      }
 
-    <div class="sidebar-footer">
-      <div style="color:#555; margin-bottom:8px;">{admin.nombre}</div>
-      <a href="/api/admin/logout" style="font-size:11px; color:#333; text-decoration:underline; text-underline-offset:3px;">
-        Cerrar sesión
-      </a>
-    </div>
-  </nav>
+      <div class="sidebar-footer">
+        <div style="color:#555; margin-bottom:8px;">{admin.nombre}</div>
+        <a
+          href="/api/admin/logout"
+          style="font-size:11px; color:#333; text-decoration:underline; text-underline-offset:3px;"
+        >
+          Cerrar sesión
+        </a>
+      </div>
+    </nav>
 
-  <!-- Main -->
-  <div class="main">
-    <div class="topbar">
-      <h1>{title}</h1>
-      <a href="/" target="_blank" style="font-size:11px; color:#333;">
-        Ver tienda →
-      </a>
+    <!-- Main -->
+    <div class="main">
+      <div class="topbar">
+        <h1>{title}</h1>
+        <a href="/" target="_blank" style="font-size:11px; color:#333;">
+          Ver tienda →
+        </a>
+      </div>
+      <div class="content">
+        <slot />
+      </div>
     </div>
-    <div class="content">
-      <slot />
-    </div>
-  </div>
-</body>
+  </body>
 </html>

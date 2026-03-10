@@ -1,8 +1,8 @@
 ---
-import '../../styles/global.css';
-import Header from './Header.astro';
-import Footer from './Footer.astro';
-import CarritoDrawer from '../carrito/CarritoDrawer';
+import "../../styles/global.css";
+import Header from "./Header.astro";
+import Footer from "./Footer.astro";
+import CarritoDrawer from "../carrito/CarritoDrawer";
 
 interface Props {
   title?: string;
@@ -12,49 +12,49 @@ interface Props {
 }
 
 const {
-  title = 'Tienda',
-  description = 'Indumentaria de diseño — minimalismo en cada prenda',
-  imagen = '/og-image.jpg',
+  title = "Tienda",
+  description = "Indumentaria de diseño — minimalismo en cada prenda",
+  imagen = "/og-image.jpg",
   class: className,
 } = Astro.props;
 
-const siteUrl = import.meta.env.SITE_URL ?? 'http://localhost:4321';
-const fullTitle = title === 'Tienda' ? title : `${title} — Tienda`;
+const siteUrl = import.meta.env.SITE_URL ?? "http://localhost:4321";
+const fullTitle = title === "Tienda" ? title : `${title} — Tienda`;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content={description} />
-  <title>{fullTitle}</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
 
-  <!-- OG -->
-  <meta property="og:title" content={fullTitle} />
-  <meta property="og:description" content={description} />
-  <meta property="og:image" content={`${siteUrl}${imagen}`} />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
+    <!-- OG -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${siteUrl}${imagen}`} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-</head>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
 
-<body>
-  <Header />
+  <body>
+    <Header />
 
-  <main class={className}>
-    <slot />
-  </main>
+    <main class={className}>
+      <slot />
+    </main>
 
-  <Footer />
+    <Footer />
 
-  <!-- Carrito drawer — React island -->
-  <CarritoDrawer client:load />
-</body>
+    <!-- Carrito drawer — React island -->
+    <CarritoDrawer client:load />
+  </body>
 </html>

@@ -5,7 +5,7 @@
 import 'dotenv/config';
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
-import { categorias, productos, variantes, adminUsers } from './schema';
+import { categorias, productos, variantes, adminUsers, clientes } from './schema';
 import bcrypt from 'bcryptjs';
 
 const sql = postgres(process.env.DATABASE_URL!);
@@ -113,6 +113,17 @@ async function seed() {
     rol: 'super_admin',
   }).onConflictDoNothing();
   console.log('✓ Admin user creado (admin@tienda.com / Admin123!)');
+
+  // Cliente demo
+  const userPasswordHash = await bcrypt.hash('Usuario123!', 12);
+  await db.insert(clientes).values({
+    email: 'usuario@tienda.com',
+    nombre: 'Usuario',
+    apellido: 'Demo',
+    passwordHash: userPasswordHash,
+    emailVerificado: true,
+  }).onConflictDoNothing();
+  console.log('✓ Cliente demo creado (usuario@tienda.com / Usuario123!)');
 
   console.log('\n✅ Seed completado!');
   await sql.end();

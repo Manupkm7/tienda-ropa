@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { mpPayment } from '../../lib/mercadopago';
-import { db } from '../../lib/db';
-import { ordenes, variantes } from '../../lib/db/schema';
+import { mpPayment } from '../../../lib/mercadopago';
+import { db } from '../../../lib/db';
+import { ordenes, variantes } from '../../../lib/db/schema';
 import { eq, sql } from 'drizzle-orm';
 
 const ESTADO_MP: Record<string, string> = {

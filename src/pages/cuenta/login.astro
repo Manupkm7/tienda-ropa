@@ -13,9 +13,9 @@ const next = Astro.url.searchParams.get('next') ?? '/cuenta';
 <Layout title="Iniciar sesión">
   <div class="max-w-md mx-auto px-4 py-20">
 
-    <div class="mb-10 text-center">
-      <p class="label-sm mb-3">Mi cuenta</p>
-      <h1 class="text-3xl font-light">Iniciar sesión</h1>
+    <div class="mb-12 text-center select-none">
+      <p class="text-center text-sm tracking-[0.3em] text-ash">Mi cuenta</p>
+      <h1 class="text-3xl font-light text-[#ff0000]">Iniciar sesión</h1>
     </div>
 
     {error && (
@@ -26,6 +26,11 @@ const next = Astro.url.searchParams.get('next') ?? '/cuenta';
     {msg === 'logout' && (
       <div class="border border-dust text-ash text-sm px-4 py-3 mb-6">
         Sesión cerrada correctamente.
+      </div>
+    )}
+    {msg === 'reset_ok' && (
+      <div class="border border-dust text-ash text-sm px-4 py-3 mb-6">
+        Contraseña actualizada. Ahora podés iniciar sesión.
       </div>
     )}
 
@@ -40,21 +45,21 @@ const next = Astro.url.searchParams.get('next') ?? '/cuenta';
       <div>
         <div class="flex justify-between items-center mb-2">
           <label class="label-sm">Contraseña</label>
-          <a href="/cuenta/recuperar" class="text-xs text-ash hover:text-ink transition-colors">
+          <a href="/cuenta/recuperar" class="text-xs text-[#ff0000] hover:text-rust transition-colors">
             Olvidé mi contraseña
           </a>
         </div>
         <input name="password" type="password" class="input-field" required autocomplete="current-password" />
       </div>
 
-      <button type="submit" class="btn-primary w-full">Ingresar</button>
+      <button type="submit" class="btn-primary w-full border border-[#ff0000]">Ingresar</button>
     </form>
 
     <div class="divider" />
 
     <p class="text-center text-sm text-ash">
       ¿No tenés cuenta?{' '}
-      <a href="/cuenta/registro" class="text-ink underline underline-offset-4 hover:text-rust transition-colors">
+      <a href="/cuenta/registro" class="text-[#ff0000] underline underline-offset-4 hover:text-rust transition-colors">
         Registrarse
       </a>
     </p>

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { cotizarEnvios, calcularBultoPedido } from '../../lib/envios';
+import { cotizarEnvios, calcularBultoPedido } from '../../../lib/envios';
 import { z } from 'zod';
 
 const esquema = z.object({

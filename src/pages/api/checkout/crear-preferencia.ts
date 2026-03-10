@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { db } from '../../lib/db';
-import { ordenes, clientes } from '../../lib/db/schema';
-import { crearPreferencia } from '../../lib/mercadopago';
+import { db } from '../../../lib/db';
+import { ordenes, clientes } from '../../../lib/db/schema';
+import { crearPreferencia } from '../../../lib/mercadopago';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 

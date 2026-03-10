@@ -78,11 +78,10 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
             <a
               key={value}
               href={buildUrl({ orden: value })}
-              className={`block text-sm transition-colors ${
-                (filtrosActivos.orden ?? 'nuevo') === value
+              className={`block text-sm transition-colors ${(filtrosActivos.orden ?? 'nuevo') === value
                   ? 'text-ink font-medium'
                   : 'text-ash hover:text-ink'
-              }`}
+                }`}
             >
               {label}
             </a>
@@ -98,9 +97,8 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
         <div className="space-y-1.5">
           <a
             href={buildUrl({ categoria: undefined })}
-            className={`block text-sm transition-colors ${
-              !filtrosActivos.categoria ? 'text-ink font-medium' : 'text-ash hover:text-ink'
-            }`}
+            className={`block text-sm transition-colors ${!filtrosActivos.categoria ? 'text-ink font-medium' : 'text-ash hover:text-ink'
+              }`}
           >
             Todas
           </a>
@@ -108,9 +106,8 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
             <a
               key={cat.slug}
               href={buildUrl({ categoria: cat.slug })}
-              className={`block text-sm transition-colors ${
-                filtrosActivos.categoria === cat.slug ? 'text-ink font-medium' : 'text-ash hover:text-ink'
-              }`}
+              className={`block text-sm transition-colors ${filtrosActivos.categoria === cat.slug ? 'text-ink font-medium' : 'text-ash hover:text-ink'
+                }`}
             >
               {cat.nombre}
             </a>
@@ -133,9 +130,8 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
             <a
               key={label}
               href={buildUrl({ genero: value })}
-              className={`block text-sm transition-colors ${
-                filtrosActivos.genero === value ? 'text-ink font-medium' : 'text-ash hover:text-ink'
-              }`}
+              className={`block text-sm transition-colors ${filtrosActivos.genero === value ? 'text-ink font-medium' : 'text-ash hover:text-ink'
+                }`}
             >
               {label}
             </a>
@@ -185,11 +181,10 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
                 <button
                   key={talla}
                   onClick={() => toggleArray('tallas', talla)}
-                  className={`w-10 h-10 text-xs border transition-colors ${
-                    activa
+                  className={`w-10 h-10 text-xs border transition-colors ${activa
                       ? 'bg-ink text-bone border-ink'
                       : 'border-dust text-ash hover:border-ink hover:text-ink'
-                  }`}
+                    }`}
                 >
                   {talla}
                 </button>

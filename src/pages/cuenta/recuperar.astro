@@ -1,0 +1,61 @@
+---
+import Layout from "../../components/layout/Layout.astro";
+
+const error = Astro.url.searchParams.get("error");
+const success = Astro.url.searchParams.get("success");
+---
+
+<Layout title="Recuperar contraseña">
+  <div class="max-w-md mx-auto px-4 py-20">
+    <div class="mb-12 text-center select-none">
+      <p class="text-center text-sm tracking-[0.3em] text-ash">Mi cuenta</p>
+      <h1 class="text-3xl font-light text-[#ff0000]">Recuperar contraseña</h1>
+    </div>
+
+    {
+      error && (
+        <div class="border border-rust/30 bg-rust/5 text-rust text-sm px-4 py-3 mb-6">
+          {decodeURIComponent(error)}
+        </div>
+      )
+    }
+
+    {
+      success && (
+        <div class="border border-dust text-ash text-sm px-4 py-3 mb-6">
+          Si existe una cuenta con ese email, te enviamos un enlace para
+          restablecer la contraseña.
+        </div>
+      )
+    }
+
+    <form method="POST" action="/api/auth/recuperar-password" class="space-y-5">
+      <div>
+        <label class="label-sm block mb-2">Email</label>
+        <input
+          name="email"
+          type="email"
+          class="input-field"
+          required
+          autocomplete="email"
+        />
+      </div>
+
+      <button type="submit" class="btn-primary w-full border border-[#ff0000]">
+        Enviar instrucciones
+      </button>
+    </form>
+
+    <div class="divider"></div>
+
+    <p class="text-center text-sm text-ash">
+      ¿Recordaste tu contraseña?
+      <a
+        href="/cuenta/login"
+        class="text-[#ff0000] underline underline-offset-4 hover:text-rust transition-colors"
+      >
+        Iniciar sesión
+      </a>
+    </p>
+  </div>
+</Layout>

@@ -81,7 +81,7 @@ export default function SelectorVariantes({ productoId, slug, nombre, precio, im
       {/* Color */}
       {coloresUnicos.length > 0 && (
         <div>
-          <p className="text-xs font-mono tracking-widest uppercase mb-3">
+          <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ash">
             Color — <span className="text-ash normal-case">{colorSeleccionado ?? 'Seleccionar'}</span>
           </p>
           <div className="flex gap-2 flex-wrap">
@@ -92,7 +92,7 @@ export default function SelectorVariantes({ productoId, slug, nombre, precio, im
                 title={color}
                 className={`relative w-8 h-8 rounded-full transition-all duration-150
                   ${colorSeleccionado === color
-                    ? 'ring-2 ring-ink ring-offset-2 ring-offset-bone scale-110'
+                    ? 'ring-2 ring-[#ff0000] ring-offset ring-offset-[#ff0000] scale-110'
                     : 'ring-1 ring-dust hover:ring-ink hover:ring-offset-1'
                   }`}
                 style={{ backgroundColor: hex }}
@@ -116,10 +116,10 @@ export default function SelectorVariantes({ productoId, slug, nombre, precio, im
       {tallasUnicas.length > 0 && (
         <div>
           <div className="flex justify-between items-center mb-3">
-            <p className="text-xs font-mono tracking-widest uppercase">
+            <p className="text-xs font-mono tracking-widest uppercase text-ash">
               Talle — <span className="text-ash normal-case">{tallaSeleccionada ?? 'Seleccionar'}</span>
             </p>
-            <a href="/talle" className="text-xs text-ash hover:text-ink underline underline-offset-2 transition-colors">
+            <a href="/talle" className="text-xs text-[#ff0000] hover:text-rust underline underline-offset-2 transition-colors">
               Guía de talles
             </a>
           </div>
@@ -134,9 +134,9 @@ export default function SelectorVariantes({ productoId, slug, nombre, precio, im
                   disabled={!disponible}
                   className={`relative w-12 h-12 text-xs border transition-all duration-150
                     ${seleccionada
-                      ? 'bg-ink text-bone border-ink'
+                      ? 'bg-ink text-ash border-[#ff0000]'
                       : disponible
-                        ? 'border-dust text-ink hover:border-ink'
+                        ? 'border-dust text-ash hover:border-[#ff0000]'
                         : 'border-dust/50 text-dust cursor-not-allowed'
                     }`}
                 >
@@ -164,7 +164,7 @@ export default function SelectorVariantes({ productoId, slug, nombre, precio, im
       {error && <p className="text-xs text-rust">{error}</p>}
 
       {/* Precio */}
-      <div className="text-2xl font-mono tracking-tight">
+      <div className="text-2xl font-mono tracking-tight text-ash">
         {formatPrecio(precioFinal)}
       </div>
 
@@ -172,7 +172,7 @@ export default function SelectorVariantes({ productoId, slug, nombre, precio, im
       <button
         onClick={handleAgregar}
         disabled={agregado || (varianteActual?.stock === 0 && !!varianteActual)}
-        className={`btn-primary w-full flex items-center justify-center gap-2 transition-all
+        className={`btn-primary w-full flex items-center justify-center gap-2 transition-all border border-[#ff0000]
           ${agregado ? 'bg-green-800 hover:bg-green-800' : ''}`}
       >
         {agregado ? (

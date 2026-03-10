@@ -118,7 +118,7 @@ export default function ImagenUploader({ value = [], onChange, productoSlug, max
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path }),
-      }).catch(() => {});
+      }).catch(() => { });
     }
   };
 

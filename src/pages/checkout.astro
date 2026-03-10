@@ -39,7 +39,9 @@ const ordenId = Astro.url.searchParams.get("orden");
           </h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="nombre" class="label-sm block mb-2 select-none">Nombre</label>
+              <label for="nombre" class="label-sm block mb-2 select-none"
+                >Nombre</label
+              >
               <input
                 id="nombre"
                 type="text"
@@ -49,7 +51,9 @@ const ordenId = Astro.url.searchParams.get("orden");
               />
             </div>
             <div>
-              <label for="apellido" class="label-sm block mb-2 select-none">Apellido</label>
+              <label for="apellido" class="label-sm block mb-2 select-none"
+                >Apellido</label
+              >
               <input
                 id="apellido"
                 type="text"
@@ -59,7 +63,9 @@ const ordenId = Astro.url.searchParams.get("orden");
               />
             </div>
             <div class="col-span-2">
-              <label for="email" class="label-sm block mb-2 select-none">Email</label>
+              <label for="email" class="label-sm block mb-2 select-none"
+                >Email</label
+              >
               <input
                 id="email"
                 type="email"
@@ -69,7 +75,9 @@ const ordenId = Astro.url.searchParams.get("orden");
               />
             </div>
             <div class="col-span-2">
-              <label for="telefono" class="label-sm block mb-2 select-none">Teléfono</label>
+              <label for="telefono" class="label-sm block mb-2 select-none"
+                >Teléfono</label
+              >
               <input
                 id="telefono"
                 type="tel"
@@ -87,7 +95,9 @@ const ordenId = Astro.url.searchParams.get("orden");
           </h2>
           <div class="grid grid-cols-6 gap-4">
             <div class="col-span-4">
-              <label for="calle" class="label-sm block mb-2 select-none">Calle</label>
+              <label for="calle" class="label-sm block mb-2 select-none"
+                >Calle</label
+              >
               <input
                 id="calle"
                 type="text"
@@ -97,7 +107,9 @@ const ordenId = Astro.url.searchParams.get("orden");
               />
             </div>
             <div class="col-span-2">
-              <label for="numero" class="label-sm block mb-2 select-none">Número</label>
+              <label for="numero" class="label-sm block mb-2 select-none"
+                >Número</label
+              >
               <input
                 id="numero"
                 type="text"
@@ -129,7 +141,9 @@ const ordenId = Astro.url.searchParams.get("orden");
               />
             </div>
             <div class="col-span-6">
-              <label for="ciudad" class="label-sm block mb-2 select-none">Ciudad</label>
+              <label for="ciudad" class="label-sm block mb-2 select-none"
+                >Ciudad</label
+              >
               <input
                 id="ciudad"
                 type="text"
@@ -139,7 +153,9 @@ const ordenId = Astro.url.searchParams.get("orden");
               />
             </div>
             <div class="col-span-3">
-              <label for="provincia" class="label-sm block mb-2 select-none">Provincia</label>
+              <label for="provincia" class="label-sm block mb-2 select-none"
+                >Provincia</label
+              >
               <select id="provincia" class="input-field" required>
                 <option value="">Seleccionar...</option>
                 {
@@ -231,7 +247,11 @@ const ordenId = Astro.url.searchParams.get("orden");
       <!-- Resumen (lado derecho) -->
       <aside class="lg:col-span-2">
         <div class="sticky top-24 space-y-6">
-          <h2 class="text-sm font-mono tracking-widest uppercase text-ash select-none">Resumen</h2>
+          <h2
+            class="text-sm font-mono tracking-widest uppercase text-ash select-none"
+          >
+            Resumen
+          </h2>
 
           <!-- Items del carrito (renderizado cliente) -->
           <div id="resumen-items" class="space-y-4 border-y border-dust py-4">
@@ -242,7 +262,9 @@ const ordenId = Astro.url.searchParams.get("orden");
           <div class="space-y-2 text-sm">
             <div class="flex justify-between">
               <span class="text-ash select-none">Subtotal</span>
-              <span id="resumen-subtotal" class="font-mono text-[#ff0000]">—</span>
+              <span id="resumen-subtotal" class="font-mono text-[#ff0000]"
+                >—</span
+              >
             </div>
             <div class="flex justify-between">
               <span class="text-ash select-none">Envío</span>
@@ -284,7 +306,9 @@ const ordenId = Astro.url.searchParams.get("orden");
             de MercadoPago.
           </p>
 
-          <div class="flex justify-center gap-3 opacity-80 border py-2 select-none">
+          <div
+            class="flex justify-center gap-3 opacity-80 border py-2 select-none"
+          >
             <span class="text-xs font-mono text-ash">VISA</span>
             <span class="text-xs font-mono text-[#ff0000]">MASTER</span>
             <span class="text-xs font-mono text-ash">AMEX</span>
@@ -462,15 +486,13 @@ const ordenId = Astro.url.searchParams.get("orden");
       }
 
       // Escuchar cambio de opción
-      opciones
-        .querySelectorAll('input[type="radio"]')
-        .forEach((r) => {
-          r.addEventListener("change", () => {
-            const index = parseInt(r.value, 10);
-            envioSeleccionado = enviosCotizados[index] ?? null;
-            actualizarTotal();
-          });
+      opciones.querySelectorAll('input[type="radio"]').forEach((r) => {
+        r.addEventListener("change", () => {
+          const index = parseInt(r.value, 10);
+          envioSeleccionado = enviosCotizados[index] ?? null;
+          actualizarTotal();
         });
+      });
     });
 
   // Pagar
