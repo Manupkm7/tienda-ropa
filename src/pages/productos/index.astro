@@ -57,7 +57,7 @@ const paginationItems = Array.from({ length: paginas }, (_, i) => i + 1).map(p =
     <!-- Page header -->
     <div class="mb-10">
       <p class="label-sm mb-2">Catálogo</p>
-      <h1 class="text-3xl font-light tracking-tight">{titulo}</h1>
+      <h1 class="text-3xl font-light tracking-tight text-ash">{titulo}</h1>
     </div>
 
     <!-- Búsqueda rápida -->
@@ -73,7 +73,7 @@ const paginationItems = Array.from({ length: paginas }, (_, i) => i + 1).map(p =
           value={filtros.busqueda ?? ''}
           class="input-field flex-1"
         />
-        <button type="submit" class="bg-ink text-bone px-5 hover:bg-rust transition-colors">
+        <button type="submit" class="bg-[#ff0000] text-bone px-5 hover:bg-rust transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
@@ -98,7 +98,7 @@ const paginationItems = Array.from({ length: paginas }, (_, i) => i + 1).map(p =
         <!-- Mobile: ordenar rápido -->
         <div class="lg:hidden mb-4 flex justify-end">
           <select
-            class="text-xs font-mono border border-dust px-3 py-2 bg-bone focus:outline-none focus:border-ink"
+            class="text-xs font-mono border border-dust px-3 py-2 text-ash bg-ink focus:outline-none focus:border-[#ff0000]"
             onchange="window.location.href = '/productos?' + new URLSearchParams({...Object.fromEntries(new URLSearchParams(window.location.search)), orden: this.value}).toString()"
           >
             <option value="nuevo" selected={filtros.orden === 'nuevo'}>Más reciente</option>
@@ -110,8 +110,8 @@ const paginationItems = Array.from({ length: paginas }, (_, i) => i + 1).map(p =
 
         {productos.length === 0 ? (
           <div class="text-center py-24">
-            <p class="text-ash mb-4">No encontramos productos con esos filtros.</p>
-            <a href="/productos" class="btn-outline inline-block">Ver todo el catálogo</a>
+            <p class="text-ash mb-4">No pudimos encontrar el producto que buscas.</p>
+            <a href="/productos" class="btn-outline inline-block text-ash border-[#ff0000]">Ver todo el catálogo</a>
           </div>
         ) : (
           <>

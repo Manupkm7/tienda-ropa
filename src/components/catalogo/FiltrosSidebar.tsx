@@ -67,7 +67,7 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
 
       {/* Ordenar */}
       <div>
-        <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ink">Ordenar</p>
+        <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ash">Ordenar</p>
         <div className="space-y-1.5">
           {[
             { value: 'nuevo', label: 'Más reciente' },
@@ -79,8 +79,8 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
               key={value}
               href={buildUrl({ orden: value })}
               className={`block text-sm transition-colors ${(filtrosActivos.orden ?? 'nuevo') === value
-                  ? 'text-ink font-medium'
-                  : 'text-ash hover:text-ink'
+                  ? 'text-rust font-medium'
+                  : 'text-ash hover:text-[#ff0000]'
                 }`}
             >
               {label}
@@ -93,11 +93,11 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
 
       {/* Categorías */}
       <div>
-        <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ink">Categoría</p>
+        <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ash">Categoría</p>
         <div className="space-y-1.5">
           <a
             href={buildUrl({ categoria: undefined })}
-            className={`block text-sm transition-colors ${!filtrosActivos.categoria ? 'text-ink font-medium' : 'text-ash hover:text-ink'
+            className={`block text-sm transition-colors ${!filtrosActivos.categoria ? 'text-rust font-medium' : 'text-ash hover:text-[#ff0000]'
               }`}
           >
             Todas
@@ -106,7 +106,7 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
             <a
               key={cat.slug}
               href={buildUrl({ categoria: cat.slug })}
-              className={`block text-sm transition-colors ${filtrosActivos.categoria === cat.slug ? 'text-ink font-medium' : 'text-ash hover:text-ink'
+              className={`block text-sm transition-colors ${filtrosActivos.categoria === cat.slug ? 'text-rust font-medium' : 'text-ash hover:text-[#ff0000]'
                 }`}
             >
               {cat.nombre}
@@ -119,7 +119,7 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
 
       {/* Género */}
       <div>
-        <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ink">Para</p>
+        <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ash">Para</p>
         <div className="space-y-1.5">
           {[
             { value: undefined, label: 'Todo' },
@@ -130,7 +130,7 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
             <a
               key={label}
               href={buildUrl({ genero: value })}
-              className={`block text-sm transition-colors ${filtrosActivos.genero === value ? 'text-ink font-medium' : 'text-ash hover:text-ink'
+              className={`block text-sm transition-colors ${filtrosActivos.genero === value ? 'text-rust font-medium' : 'text-ash hover:text-[#ff0000]'
                 }`}
             >
               {label}
@@ -144,7 +144,7 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
       {/* Colores */}
       {colores.length > 0 && (
         <div>
-          <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ink">Color</p>
+          <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ash">Color</p>
           <div className="flex flex-wrap gap-2">
             {colores.map(({ color, hex }) => {
               const activo = (filtrosActivos.colores ?? []).includes(color);
@@ -154,7 +154,7 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
                   onClick={() => toggleArray('colores', color)}
                   title={color}
                   className={`flex items-center gap-1.5 text-xs transition-colors px-2 py-1
-                    border ${activo ? 'border-ink text-ink' : 'border-dust text-ash hover:border-ink hover:text-ink'}`}
+                    border ${activo ? 'border-[#ff0000] text-ash' : 'border-dust text-ash hover:border-[#ff0000] hover:text-ash'}`}
                 >
                   <span
                     className="w-3 h-3 rounded-full border border-dust/50 flex-shrink-0"
@@ -173,7 +173,7 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
       {/* Talles */}
       {tallas.length > 0 && (
         <div>
-          <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ink">Talle</p>
+          <p className="text-xs font-mono tracking-widest uppercase mb-3 text-ash">Talle</p>
           <div className="flex flex-wrap gap-2">
             {tallas.map(talla => {
               const activa = (filtrosActivos.tallas ?? []).includes(talla);
@@ -182,8 +182,8 @@ export default function FiltrosSidebar({ categorias, colores, tallas, filtrosAct
                   key={talla}
                   onClick={() => toggleArray('tallas', talla)}
                   className={`w-10 h-10 text-xs border transition-colors ${activa
-                      ? 'bg-ink text-bone border-ink'
-                      : 'border-dust text-ash hover:border-ink hover:text-ink'
+                      ? 'bg-ink text-bone border-[#ff0000]'
+                      : 'border-dust text-ash hover:border-[#ff0000] hover:text-ash'
                     }`}
                 >
                   {talla}

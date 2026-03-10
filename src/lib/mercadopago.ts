@@ -86,7 +86,6 @@ export async function crearPreferencia(
         failure: `${siteUrl}/checkout?status=failed&orden=${ordenId}`,
         pending: `${siteUrl}/orden/${ordenId}?status=pending`,
       },
-      auto_return: 'approved',
       notification_url: `${siteUrl}/api/webhooks/mercadopago`,
       external_reference: ordenId,
       statement_descriptor: 'TIENDA ONLINE',

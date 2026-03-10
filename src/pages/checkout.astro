@@ -463,13 +463,13 @@ const ordenId = Astro.url.searchParams.get("orden");
       opciones.innerHTML = enviosCotizados
         .map(
           (op, i) => `
-      <label class="flex items-start gap-3 border border-dust p-3 cursor-pointer hover:border-ink transition-colors has-[:checked]:border-ink has-[:checked]:bg-ink/5">
+      <label class="flex items-start gap-3 border border-dust p-3 cursor-pointer hover:border-[#ff0000] transition-colors has-[:checked]:border-[#ff0000] has-[:checked]:bg-[#ff0000]/5">
         <input type="radio" name="envio" value="${i}" class="mt-0.5" ${i === 0 ? "checked" : ""} />
         <div class="flex-1">
-          <p class="text-sm">${op.descripcion}</p>
+          <p class="text-sm text-ash">${op.descripcion}</p>
           <p class="text-xs text-ash mt-0.5">${op.diasEstimados === 0 ? "Inmediato" : `${op.diasEstimados} días hábiles`}</p>
         </div>
-        <span class="text-sm font-mono flex-shrink-0">${op.precio === 0 ? "Gratis" : fmt(op.precio)}</span>
+        <span class="text-sm font-mono flex-shrink-0 text-[#ff0000]">${op.precio === 0 ? "Gratis" : fmt(op.precio)}</span>
       </label>
     `,
         )
