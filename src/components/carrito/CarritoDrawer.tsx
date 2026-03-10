@@ -24,28 +24,28 @@ export default function CarritoDrawer() {
       {/* Overlay */}
       {abierto && (
         <div
-          className="fixed inset-0 bg-ink/30 backdrop-blur-sm z-40"
+          className="fixed inset-0 bg-black/60 z-40"
           onClick={() => carritoAbierto.set(false)}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-bone z-50 flex flex-col
-                    border-l border-dust shadow-2xl transition-transform duration-300 ease-in-out
+        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-[#000000] z-50 flex flex-col
+                     shadow-2xl transition-transform duration-300 ease-in-out
                     ${abierto ? 'translate-x-0' : 'translate-x-full'}`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-dust">
+        <div className="flex items-center justify-between px-6 py-5">
           <div className="flex items-center gap-3">
-            <ShoppingBag size={16} strokeWidth={1.5} />
-            <span className="text-xs font-mono tracking-widest uppercase">
+            <ShoppingBag size={20} strokeWidth={1.5} color='white' />
+            <span className="text-xs tracking-[0.2em] uppercase select-none text-white">
               Carrito ({items.length})
             </span>
           </div>
           <button
             onClick={() => carritoAbierto.set(false)}
-            className="text-ash hover:text-ink transition-colors"
+            className="text-ash hover:text-[#ff0000] transition-colors"
           >
             <X size={18} strokeWidth={1.5} />
           </button>
@@ -84,11 +84,11 @@ export default function CarritoDrawer() {
                     <a
                       href={`/productos/${item.slug}`}
                       onClick={() => carritoAbierto.set(false)}
-                      className="text-sm leading-tight hover:text-rust transition-colors"
+                      className="text-sm leading-tight text-ash hover:text-[#ff0000] transition-colors select-none"
                     >
                       {item.nombre}
                     </a>
-                    <div className="flex gap-2 mt-1">
+                    <div className="flex gap-2 mt-1 select-none">
                       {item.color && (
                         <span className="text-xs text-ash flex items-center gap-1">
                           {item.codigoHex && (
@@ -111,14 +111,14 @@ export default function CarritoDrawer() {
                     <div className="flex items-center gap-2 border border-dust">
                       <button
                         onClick={() => actualizarCantidad(item.productoId, item.varianteId, item.cantidad - 1)}
-                        className="w-7 h-7 flex items-center justify-center text-ash hover:text-ink transition-colors"
+                        className="w-7 h-7 flex items-center justify-center text-ash hover:text-[#ff0000] transition-colors"
                       >
                         <Minus size={12} />
                       </button>
-                      <span className="text-xs font-mono w-6 text-center">{item.cantidad}</span>
+                      <span className="text-xs font-mono w-6 text-center text-ash">{item.cantidad}</span>
                       <button
                         onClick={() => actualizarCantidad(item.productoId, item.varianteId, item.cantidad + 1)}
-                        className="w-7 h-7 flex items-center justify-center text-ash hover:text-ink transition-colors"
+                        className="w-7 h-7 flex items-center justify-center text-ash hover:text-[#ff0000] transition-colors"
                       >
                         <Plus size={12} />
                       </button>
@@ -145,23 +145,23 @@ export default function CarritoDrawer() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-dust px-6 py-6 space-y-4">
+          <div className="mt-auto space-y-4 select-none px-3 pb-5">
             <div className="flex justify-between items-center">
-              <span className="text-xs text-ash tracking-wider uppercase">Subtotal</span>
-              <span className="text-sm font-mono">{formatPrecio(total)}</span>
+              <span className="text-xs text-ash tracking-wider uppercase select-none">Subtotal</span>
+              <span className="text-sm font-mono text-white">{formatPrecio(total)}</span>
             </div>
-            <p className="text-xs text-ash">Envío calculado en el siguiente paso</p>
+            <p className="text-xs text-ash select-none">Envío calculado en el siguiente paso</p>
             <a
               href="/checkout"
               onClick={() => carritoAbierto.set(false)}
-              className="btn-primary w-full flex items-center justify-center gap-2"
+              className="w-full py-4 text-xs tracking-[0.2em] font-medium flex items-center justify-center gap-2 transition-opacity hover:opacity-90 bg-[#ff0000] text-white"
             >
               Ir al checkout
               <ArrowRight size={14} />
             </a>
             <button
               onClick={() => carritoAbierto.set(false)}
-              className="w-full text-xs text-ash hover:text-ink transition-colors tracking-wider uppercase text-center"
+              className="w-full py-4 text-xs tracking-[0.2em] border text-ash hover:text-[#ff0000] transition-colors select-none"
             >
               Seguir comprando
             </button>

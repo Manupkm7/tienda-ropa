@@ -2,25 +2,31 @@
 const año = new Date().getFullYear();
 ---
 
-<footer class="border-t border-dust mt-24 bg-bone">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+<footer class="bg-[#0a0a0a]">
+  <div class="max-w-7xl mx-auto px-6 py-16">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
       <div class="col-span-2 md:col-span-1">
-        <p class="text-xs font-mono tracking-[0.25em] uppercase mb-4">TIENDA</p>
-        <p class="text-sm text-ash leading-relaxed max-w-xs">
+        <a href="/" class="flex items-center gap-2 mb-2">
+          <h1
+            class="text-lg font-semibold tracking-[0.25em] uppercase text-white"
+          >
+            T<span class="text-[#ff0000]">I</span>ENDA
+          </h1>
+        </a>
+        <p class="text-xs text-ash leading-relaxed max-w-xs select-none">
           Indumentaria de diseño. Prendas pensadas para durar.
         </p>
       </div>
 
       <div>
-        <p class="label-sm mb-4">Catálogo</p>
+        <p class="label-sm mb-4 select-none">Catálogo</p>
         <ul class="space-y-2">
           {
             ["Remeras", "Pantalones", "Camperas", "Accesorios"].map((cat) => (
               <li>
                 <a
                   href={`/productos?categoria=${cat.toLowerCase()}`}
-                  class="text-sm text-ash hover:text-ink transition-colors"
+                  class="text-[13px] text-ash hover:text-[#ff0000] transition-colors select-none"
                 >
                   {cat}
                 </a>
@@ -31,7 +37,7 @@ const año = new Date().getFullYear();
       </div>
 
       <div>
-        <p class="label-sm mb-4">Información</p>
+        <p class="label-sm mb-4 select-none">Información</p>
         <ul class="space-y-2">
           {
             [
@@ -43,7 +49,7 @@ const año = new Date().getFullYear();
               <li>
                 <a
                   href={href}
-                  class="text-sm text-ash hover:text-ink transition-colors"
+                  class="text-[13px] text-ash hover:text-[#ff0000] transition-colors select-none"
                 >
                   {label}
                 </a>
@@ -54,12 +60,12 @@ const año = new Date().getFullYear();
       </div>
 
       <div>
-        <p class="label-sm mb-4">Seguinos</p>
+        <p class="label-sm mb-4 select-none">Seguinos</p>
         <ul class="space-y-2">
           <li>
             <a
               href="https://www.instagram.com/realyugan/"
-              class="text-sm text-ash hover:text-ink transition-colors"
+              class="text-[13px] text-ash hover:text-[#ff0000] transition-colors select-none"
               target="_blank"
               rel="noopener noreferrer">Instagram</a
             >
@@ -69,7 +75,7 @@ const año = new Date().getFullYear();
               href="https://www.instagram.com/realyugan/"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-sm text-ash hover:text-ink transition-colors"
+              class="text-[13px] text-ash hover:text-[#ff0000] transition-colors select-none"
               >TikTok</a
             >
           </li>
@@ -80,12 +86,18 @@ const año = new Date().getFullYear();
     <div
       class="border-t border-dust pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
     >
-      <p class="label-sm">© {año} TIENDA. Todos los derechos reservados.</p>
+      <p class="text-[10px] text-ash select-none">
+        © {año} TIENDA. Todos los derechos reservados.
+      </p>
       <div class="flex gap-4">
-        <a href="/privacidad" class="label-sm hover:text-ink transition-colors"
+        <a
+          href="/privacidad"
+          class="text-[10px] text-ash hover:text-[#ff0000] transition-colors select-none"
           >Privacidad</a
         >
-        <a href="/terminos" class="label-sm hover:text-ink transition-colors"
+        <a
+          href="/terminos"
+          class="text-[10px] text-ash hover:text-[#ff0000] transition-colors select-none"
           >Términos</a
         >
       </div>

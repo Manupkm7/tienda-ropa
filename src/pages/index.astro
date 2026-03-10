@@ -22,15 +22,16 @@ const cats = await db.query.categorias.findMany({
   description="Indumentaria de diseño — minimalismo en cada prenda"
 >
   <!-- Categorías -->
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-20">
-    <p class="label-sm mb-8">Explorar por categoría</p>
+  <section class="max-w-7xl mx-auto px-6 py-12">
+    <p class="text-[10px] tracking-[0.3em] mb-6 select-none uppercase text-ash">
+      Explorar por categoría
+    </p>
     <div class="flex flex-wrap gap-3">
       {
         cats.map((cat) => (
           <a
             href={`/productos?categoria=${cat.slug}`}
-            class="px-6 py-3 border border-dust text-sm hover:border-ink hover:bg-ink hover:text-bone
-                 transition-all duration-200 tracking-wide"
+            class="px-6 py-3 border border-[#ff0000] text-sm hover:text-[#ff0000] transition-all duration-200 tracking-wide text-ash"
           >
             {cat.nombre}
           </a>
@@ -38,8 +39,7 @@ const cats = await db.query.categorias.findMany({
       }
       <a
         href="/productos"
-        class="px-6 py-3 border border-dust text-sm text-ash hover:text-ink hover:border-ink
-               transition-all duration-200 tracking-wide"
+        class="px-6 py-3 border border-[#ff0000] text-sm text-ash hover:text-[#ff0000] hover:border-[#ff0000] transition-all duration-200 tracking-wide"
       >
         Ver todo →
       </a>
@@ -54,7 +54,7 @@ const cats = await db.query.categorias.findMany({
           <p class="label-sm">Destacados</p>
           <a
             href="/productos?soloDestacados=true"
-            class="text-xs text-ash hover:text-ink transition-colors"
+            class="text-xs text-ash hover:text-[#ff0000] transition-colors"
           >
             Ver todos →
           </a>
@@ -81,41 +81,10 @@ const cats = await db.query.categorias.findMany({
       </div>
       <a
         href="/productos"
-        class="btn-outline border-[#ff0000]/30 text-bone hover:bg-[#ff0000] hover:text-ink flex-shrink-0"
+        class="btn-outline border-[#ff0000]/30 text-bone hover:bg-[#ff0000] hover:text-white flex-shrink-0"
       >
         Explorar
       </a>
-    </div>
-  </section>
-
-  <!-- Features -->
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 py-20">
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
-      {
-        [
-          {
-            icon: "○",
-            titulo: "Materiales premium",
-            desc: "Seleccionamos cada tela con criterio. Calidad sobre cantidad.",
-          },
-          {
-            icon: "△",
-            titulo: "Envíos a todo el país",
-            desc: "Andreani y OCA. Seguimiento en tiempo real.",
-          },
-          {
-            icon: "□",
-            titulo: "Devoluciones fáciles",
-            desc: "30 días para cambios. Sin preguntas, sin complicaciones.",
-          },
-        ].map(({ icon, titulo, desc }) => (
-          <div>
-            <p class="text-2xl mb-4 text-dust">{icon}</p>
-            <h3 class="text-sm font-medium mb-2">{titulo}</h3>
-            <p class="text-sm text-ash leading-relaxed">{desc}</p>
-          </div>
-        ))
-      }
     </div>
   </section>
 </Layout>

@@ -14,12 +14,12 @@ const cliente = await getClienteFromCookies(Astro.cookies);
 ---
 
 <header class="sticky top-0 z-30 bg-ink border-b border-[#ff0000]">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+  <div class="max-w-7xl mx-auto px-6 py-4">
     <div class="flex items-center justify-between h-14">
 
       <!-- Logo -->
       <a href="/" class="flex items-center gap-2 group">
-        <h1 class="text-lg font-medium tracking-[0.25em] uppercase text-white">
+        <h1 class="text-lg font-semibold tracking-[0.25em] uppercase text-white">
           T<span class="text-[#ff0000]">I</span>ENDA
         </h1>
       </a>
@@ -42,7 +42,7 @@ const cliente = await getClienteFromCookies(Astro.cookies);
 
       <!-- Acciones -->
       <div class="flex items-center gap-4">
-        <a href="/productos" class="text-ash hover:text-ink transition-colors" aria-label="Buscar">
+        <a href="/productos" class="text-ash hover:text-[#ff0000] transition-colors" aria-label="Buscar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
@@ -51,7 +51,7 @@ const cliente = await getClienteFromCookies(Astro.cookies);
         <!-- Cuenta de usuario -->
         <a
           href={cliente ? '/cuenta' : '/cuenta/login'}
-          class="text-ash hover:text-ink transition-colors relative"
+          class="text-ash hover:text-[#ff0000] transition-colors relative"
           aria-label={cliente ? `Mi cuenta (${cliente.nombre})` : 'Iniciar sesión'}
           title={cliente ? `${cliente.nombre} ${cliente.apellido}` : 'Iniciar sesión'}
         >
