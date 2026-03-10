@@ -1,0 +1,197 @@
+---
+import Layout from '../../components/layout/Layout.astro';
+import SelectorVariantes from '../../components/catalogo/SelectorVariantes';
+import ProductoCard from '../../components/catalogo/ProductoCard.astro';
+import { obtenerProductoPorSlug, obtenerProductos } from '../../lib/productos';
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/productos');
+
+const producto = await obtenerProductoPorSlug(slug);
+if (!producto) return Astro.redirect('/404');
+
+// Relacionados (misma categoría)
+const { productos: relacionados } = await obtenerProductos({
+  categoria: producto.categoria?.slug,
+  porPagina: 4,
+});
+const otrosRelacionados = relacionados.filter(p => p.id !== producto.id).slice(0, 4);
+
+const precio = parseFloat(producto.precio);
+const precioOriginal = producto.precioOriginal ? parseFloat(producto.precioOriginal) : null;
+const descuento = precioOriginal ? Math.round((1 - precio / precioOriginal) * 100) : null;
+
+const formatPrecio = (n: number) =>
+  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+---
+
+<Layout
+  title={producto.nombre}
+  description={producto.descripcionCorta ?? producto.descripcion ?? producto.nombre}
+  imagen={producto.imagenes?.[0]}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+
+    <!-- Breadcrumb -->
+    <nav class="mb-8 flex gap-2 text-xs text-ash">
+      <a href="/" class="hover:text-ink transition-colors">Inicio</a>
+      <span>/</span>
+      <a href="/productos" class="hover:text-ink transition-colors">Catálogo</a>
+      {producto.categoria && (
+        <>
+          <span>/</span>
+          <a href={`/productos?categoria=${producto.categoria.slug}`} class="hover:text-ink transition-colors">
+            {producto.categoria.nombre}
+          </a>
+        </>
+      )}
+      <span>/</span>
+      <span class="text-ink">{producto.nombre}</span>
+    </nav>
+
+    <!-- Producto -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 mb-24">
+
+      <!-- Galería -->
+      <div class="space-y-3" x-data="{ activa: 0 }">
+        <!-- Imagen principal -->
+        <div id="imagen-principal" class="aspect-[4/5] bg-dust overflow-hidden">
+          <img
+            id="img-main"
+            src={producto.imagenes?.[0] ?? '/images/placeholder.jpg'}
+            alt={producto.nombre}
+            class="w-full h-full object-cover object-center"
+          />
+        </div>
+
+        <!-- Thumbnails -->
+        {producto.imagenes && producto.imagenes.length > 1 && (
+          <div class="grid grid-cols-4 gap-2">
+            {producto.imagenes.map((img, i) => (
+              <button
+                class="aspect-square bg-dust overflow-hidden thumbnail-btn border-2 border-transparent hover:border-ink transition-colors"
+                data-src={img}
+                data-index={i}
+                onclick={`
+                  document.getElementById('img-main').src = '${img}';
+                  document.querySelectorAll('.thumbnail-btn').forEach((b, j) => {
+                    b.classList.toggle('border-ink', j === ${i});
+                    b.classList.toggle('border-transparent', j !== ${i});
+                  });
+                `}
+              >
+                <img src={img} alt={`${producto.nombre} ${i + 1}`} class="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <!-- Info + selector -->
+      <div class="lg:sticky lg:top-24 lg:self-start">
+        {producto.categoria && (
+          <p class="label-sm mb-3">{producto.categoria.nombre}</p>
+        )}
+
+        <h1 class="text-3xl font-light tracking-tight mb-2">{producto.nombre}</h1>
+
+        {producto.descripcionCorta && (
+          <p class="text-sm text-ash mb-6 leading-relaxed">{producto.descripcionCorta}</p>
+        )}
+
+        <!-- Precio -->
+        <div class="flex items-baseline gap-3 mb-8">
+          <span class="text-2xl font-mono">{formatPrecio(precio)}</span>
+          {precioOriginal && (
+            <span class="font-mono precio-original">{formatPrecio(precioOriginal)}</span>
+          )}
+          {descuento && (
+            <span class="tag bg-rust text-bone border-0">−{descuento}%</span>
+          )}
+        </div>
+
+        <!-- Selector variantes — React island -->
+        <SelectorVariantes
+          client:load
+          productoId={producto.id}
+          slug={producto.slug}
+          nombre={producto.nombre}
+          precio={precio}
+          imagen={producto.imagenes?.[0] ?? '/images/placeholder.jpg'}
+          pesoKg={producto.peso ? parseFloat(producto.peso) : 0.3}
+          variantes={producto.variantes}
+        />
+
+        <div class="divider" />
+
+        <!-- Detalles -->
+        {producto.material && (
+          <div class="flex justify-between py-3 border-b border-dust text-sm">
+            <span class="text-ash">Material</span>
+            <span>{producto.material}</span>
+          </div>
+        )}
+        {producto.genero && (
+          <div class="flex justify-between py-3 border-b border-dust text-sm">
+            <span class="text-ash">Para</span>
+            <span class="capitalize">{producto.genero}</span>
+          </div>
+        )}
+        {producto.tags && producto.tags.length > 0 && (
+          <div class="flex justify-between py-3 border-b border-dust text-sm items-start gap-4">
+            <span class="text-ash">Tags</span>
+            <div class="flex flex-wrap gap-1 justify-end">
+              {producto.tags.map(tag => <span class="tag">{tag}</span>)}
+            </div>
+          </div>
+        )}
+
+        <!-- Descripción completa colapsable -->
+        {producto.descripcion && (
+          <details class="mt-4 group">
+            <summary class="flex justify-between items-center cursor-pointer py-3 text-sm font-medium list-none">
+              Descripción del producto
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                   class="group-open:rotate-180 transition-transform">
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </summary>
+            <p class="text-sm text-ash leading-relaxed pt-2 pb-3">
+              {producto.descripcion}
+            </p>
+          </details>
+        )}
+
+        <!-- Envíos -->
+        <details class="mt-1 group">
+          <summary class="flex justify-between items-center cursor-pointer py-3 text-sm font-medium list-none">
+            Envíos y devoluciones
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                 class="group-open:rotate-180 transition-transform">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </summary>
+          <div class="text-sm text-ash leading-relaxed pt-2 pb-3 space-y-2">
+            <p>📦 Envíos por <strong>Andreani</strong> y <strong>OCA</strong> a todo el país.</p>
+            <p>💳 Costo calculado en el checkout según tu dirección.</p>
+            <p>🔄 Devoluciones dentro de los 30 días con el producto sin uso.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- Relacionados -->
+    {otrosRelacionados.length > 0 && (
+      <section>
+        <div class="divider" />
+        <p class="label-sm mb-8">También te puede gustar</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10">
+          {otrosRelacionados.map((prod, i) => (
+            <ProductoCard producto={prod} index={i} />
+          ))}
+        </div>
+      </section>
+    )}
+
+  </div>
+</Layout>

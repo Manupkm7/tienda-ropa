@@ -1,0 +1,75 @@
+---
+import Layout from '../../components/layout/Layout.astro';
+import { getClienteFromCookies } from '../../lib/userAuth';
+
+const cliente = await getClienteFromCookies(Astro.cookies);
+if (cliente) return Astro.redirect('/cuenta');
+
+const error = Astro.url.searchParams.get('error');
+---
+
+<Layout title="Crear cuenta">
+  <div class="max-w-md mx-auto px-4 py-20">
+
+    <div class="mb-10 text-center">
+      <p class="label-sm mb-3">Mi cuenta</p>
+      <h1 class="text-3xl font-light">Crear cuenta</h1>
+    </div>
+
+    {error && (
+      <div class="border border-rust/30 bg-rust/5 text-rust text-sm px-4 py-3 mb-6">
+        {decodeURIComponent(error)}
+      </div>
+    )}
+
+    <form method="POST" action="/api/auth/registro" class="space-y-5">
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="label-sm block mb-2">Nombre</label>
+          <input name="nombre" type="text" class="input-field" required autocomplete="given-name" />
+        </div>
+        <div>
+          <label class="label-sm block mb-2">Apellido</label>
+          <input name="apellido" type="text" class="input-field" required autocomplete="family-name" />
+        </div>
+      </div>
+
+      <div>
+        <label class="label-sm block mb-2">Email</label>
+        <input name="email" type="email" class="input-field" required autocomplete="email" />
+      </div>
+
+      <div>
+        <label class="label-sm block mb-2">Teléfono (opcional)</label>
+        <input name="telefono" type="tel" class="input-field" autocomplete="tel" />
+      </div>
+
+      <div>
+        <label class="label-sm block mb-2">Contraseña</label>
+        <input name="password" type="password" class="input-field" required
+               autocomplete="new-password" minlength="8"
+               placeholder="Mínimo 8 caracteres" />
+      </div>
+
+      <button type="submit" class="btn-primary w-full">Crear cuenta</button>
+
+      <p class="text-xs text-ash text-center leading-relaxed">
+        Al registrarte aceptás nuestros
+        <a href="/terminos" class="underline underline-offset-2 hover:text-ink">términos de uso</a>
+        y
+        <a href="/privacidad" class="underline underline-offset-2 hover:text-ink">política de privacidad</a>.
+      </p>
+    </form>
+
+    <div class="divider" />
+
+    <p class="text-center text-sm text-ash">
+      ¿Ya tenés cuenta?{' '}
+      <a href="/cuenta/login" class="text-ink underline underline-offset-4 hover:text-rust transition-colors">
+        Iniciar sesión
+      </a>
+    </p>
+
+  </div>
+</Layout>

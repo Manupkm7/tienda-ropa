@@ -1,0 +1,12 @@
+import type { APIRoute } from 'astro';
+import { clearSessionCookie } from '../../../lib/auth';
+
+export const GET: APIRoute = ({ cookies, redirect }) => {
+  clearSessionCookie(cookies);
+  return redirect('/admin/login');
+};
+
+export const POST: APIRoute = ({ cookies, redirect }) => {
+  clearSessionCookie(cookies);
+  return redirect('/admin/login');
+};

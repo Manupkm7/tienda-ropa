@@ -1,0 +1,77 @@
+---
+// Admin login — redirige si ya hay sesión
+import { getAdminFromCookies } from '../../lib/auth';
+
+const admin = await getAdminFromCookies(Astro.cookies);
+if (admin) return Astro.redirect('/admin');
+
+const error = Astro.url.searchParams.get('error');
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Acceso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    body {
+      background: #0D0D0D; color: #F5F2ED;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .card {
+      width: 100%; max-width: 360px; padding: 40px 32px;
+      border: 1px solid #2a2a2a;
+    }
+    .logo { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: #555; margin-bottom: 32px; }
+    h1 { font-size: 20px; font-weight: 300; margin-bottom: 32px; }
+    label { display: block; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #555; margin-bottom: 6px; }
+    input {
+      width: 100%; background: transparent; border: 1px solid #2a2a2a; color: #F5F2ED;
+      padding: 12px 14px; font-size: 14px; outline: none; transition: border-color 0.15s;
+      font-family: inherit;
+    }
+    input:focus { border-color: #F5F2ED; }
+    .field { margin-bottom: 20px; }
+    button {
+      width: 100%; background: #F5F2ED; color: #0D0D0D; border: none;
+      padding: 14px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; font-family: inherit; font-weight: 500; transition: background 0.15s;
+      margin-top: 8px;
+    }
+    button:hover { background: #C4522A; color: #F5F2ED; }
+    .error {
+      background: rgba(196, 82, 42, 0.15); border: 1px solid rgba(196, 82, 42, 0.4);
+      color: #C4522A; padding: 10px 14px; font-size: 12px; margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="logo">TIENDA / ADMIN</p>
+    <h1>Acceso</h1>
+
+    {error && <div class="error">{
+      error === 'invalid' ? 'Email o contraseña incorrectos' :
+      error === 'inactive' ? 'Usuario inactivo' :
+      'Error de acceso'
+    }</div>}
+
+    <form method="POST" action="/api/admin/login">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required autocomplete="email" placeholder="admin@tienda.com" />
+      </div>
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password" />
+      </div>
+      <button type="submit">Ingresar</button>
+    </form>
+  </div>
+</body>
+</html>

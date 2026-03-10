@@ -1,0 +1,145 @@
+---
+import Layout from '../../components/layout/Layout.astro';
+import { db } from '../../lib/db';
+import { ordenes } from '../../lib/db/schema';
+import { eq } from 'drizzle-orm';
+
+const { id } = Astro.params;
+const status = Astro.url.searchParams.get('status') ?? 'success';
+
+if (!id) return Astro.redirect('/');
+
+const orden = await db.query.ordenes.findFirst({
+  where: eq(ordenes.id, id),
+  with: { cliente: true },
+});
+
+if (!orden) return Astro.redirect('/');
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+
+const estados: Record<string, { icon: string; titulo: string; color: string; mensaje: string }> = {
+  success: {
+    icon: '✓',
+    titulo: '¡Pago exitoso!',
+    color: 'text-green-700',
+    mensaje: 'Tu pedido fue confirmado. Te enviaremos un email con el seguimiento.',
+  },
+  pending: {
+    icon: '◷',
+    titulo: 'Pago pendiente',
+    color: 'text-amber-600',
+    mensaje: 'Tu pago está siendo procesado. Te avisaremos cuando se confirme.',
+  },
+  failed: {
+    icon: '✕',
+    titulo: 'Pago no procesado',
+    color: 'text-rust',
+    mensaje: 'No pudimos procesar tu pago. Podés intentarlo de nuevo.',
+  },
+};
+
+const estadoUI = estados[status] ?? estados.pending;
+---
+
+<Layout title={estadoUI.titulo}>
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 py-20">
+
+    <!-- Status -->
+    <div class="text-center mb-12">
+      <div class={`text-5xl mb-4 ${estadoUI.color}`}>{estadoUI.icon}</div>
+      <h1 class="text-2xl font-light mb-3">{estadoUI.titulo}</h1>
+      <p class="text-sm text-ash">{estadoUI.mensaje}</p>
+    </div>
+
+    <!-- Número de orden -->
+    <div class="border border-dust p-6 mb-8 text-center">
+      <p class="label-sm mb-2">Número de orden</p>
+      <p class="text-2xl font-mono">#{String(orden.numero).padStart(4, '0')}</p>
+      <p class="text-xs text-ash mt-2 font-mono">{orden.id}</p>
+    </div>
+
+    <!-- Items -->
+    <div class="space-y-4 mb-8">
+      <h2 class="label-sm">Tu pedido</h2>
+      {(orden.items ?? []).map(item => (
+        <div class="flex gap-4 py-3 border-b border-dust last:border-0">
+          <div class="w-16 h-20 bg-dust flex-shrink-0 overflow-hidden">
+            <img src={item.imagen || '/images/placeholder.jpg'} alt={item.nombre}
+                 class="w-full h-full object-cover" />
+          </div>
+          <div class="flex-1">
+            <p class="text-sm">{item.nombre}</p>
+            {(item.color || item.talla) && (
+              <p class="text-xs text-ash mt-0.5">{[item.color, item.talla].filter(Boolean).join(' / ')}</p>
+            )}
+            <p class="text-xs text-ash mt-1">Cantidad: {item.cantidad}</p>
+          </div>
+          <p class="text-sm font-mono flex-shrink-0">{fmt(item.precio * item.cantidad)}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Totales -->
+    <div class="border-t border-dust pt-4 space-y-2 mb-8">
+      <div class="flex justify-between text-sm">
+        <span class="text-ash">Subtotal</span>
+        <span class="font-mono">{fmt(parseFloat(orden.subtotal))}</span>
+      </div>
+      {parseFloat(orden.costoEnvio ?? '0') > 0 && (
+        <div class="flex justify-between text-sm">
+          <span class="text-ash">Envío</span>
+          <span class="font-mono">{fmt(parseFloat(orden.costoEnvio!))}</span>
+        </div>
+      )}
+      <div class="flex justify-between font-medium pt-2 border-t border-dust">
+        <span>Total pagado</span>
+        <span class="font-mono">{fmt(parseFloat(orden.total))}</span>
+      </div>
+    </div>
+
+    <!-- Dirección -->
+    {orden.datosEnvio && (
+      <div class="bg-dust/30 p-4 mb-8 text-sm">
+        <p class="label-sm mb-2">Envío a</p>
+        <p>{orden.datosEnvio.nombreDestinatario}</p>
+        <p class="text-ash">
+          {orden.datosEnvio.direccion.calle} {orden.datosEnvio.direccion.numero}
+          {orden.datosEnvio.direccion.piso ? `, Piso ${orden.datosEnvio.direccion.piso}` : ''}
+          {orden.datosEnvio.direccion.depto ? ` Depto ${orden.datosEnvio.direccion.depto}` : ''}
+        </p>
+        <p class="text-ash">
+          {orden.datosEnvio.direccion.ciudad}, {orden.datosEnvio.direccion.provincia} CP {orden.datosEnvio.direccion.codigoPostal}
+        </p>
+        {orden.datosEnvio.metodo !== 'retiro' && (
+          <p class="text-ash mt-1">
+            Proveedor: <span class="capitalize">{orden.datosEnvio.metodo}</span>
+            {orden.datosEnvio.estimadoDias ? ` · ${orden.datosEnvio.estimadoDias} días hábiles` : ''}
+          </p>
+        )}
+      </div>
+    )}
+
+    <!-- Acciones -->
+    <div class="flex flex-col sm:flex-row gap-3">
+      {status === 'failed' ? (
+        <a href="/checkout" class="btn-primary text-center flex-1">Intentar de nuevo</a>
+      ) : (
+        <a href="/productos" class="btn-primary text-center flex-1" id="btn-volver">
+          Seguir comprando
+        </a>
+      )}
+      <a href="/" class="btn-outline text-center">Ir al inicio</a>
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  // Vaciar carrito si el pago fue exitoso
+  const status = new URLSearchParams(window.location.search).get('status');
+  if (status === 'success') {
+    import('../store/carrito').then(({ vaciarCarrito }) => vaciarCarrito());
+  }
+</script>

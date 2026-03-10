@@ -1,0 +1,144 @@
+---
+import type { ProductoConVariantes } from "../../lib/db/schema";
+
+interface Props {
+  producto: ProductoConVariantes;
+  index?: number;
+}
+
+const { producto, index = 0 } = Astro.props;
+
+const precio = parseFloat(producto.precio);
+const precioOriginal = producto.precioOriginal
+  ? parseFloat(producto.precioOriginal)
+  : null;
+const descuento = precioOriginal
+  ? Math.round((1 - precio / precioOriginal) * 100)
+  : null;
+const imagen = producto.imagenes?.[0] ?? "/images/placeholder.jpg";
+
+const coloresUnicos = [
+  ...new Map(
+    producto.variantes
+      .filter((v) => v.color)
+      .map((v) => [v.color, { color: v.color!, hex: v.codigoHex ?? "#000" }]),
+  ).values(),
+];
+
+const hayStock = producto.variantes.some((v) => v.stock > 0);
+
+const formatPrecio = (n: number) =>
+  new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(n);
+---
+
+<article class="group relative" style={`animation-delay: ${index * 60}ms`}>
+  <a href={`/productos/${producto.slug}`} class="block">
+    <!-- Imagen -->
+    <div class="relative overflow-hidden bg-[#0a0a0a] aspect-[3/4] mb-3">
+      {
+        imagen ? (
+          <img
+            src={imagen}
+            alt={producto.nombre}
+            class="w-full h-full object-cover object-center transition-transform duration-700
+               group-hover:scale-[1.04]"
+            loading="lazy"
+          />
+        ) : (
+          <span class="text-sm tracking-widest">IMAGEN</span>
+        )
+      }
+
+      <!-- Segunda imagen al hover -->
+      {
+        producto.imagenes?.[1] && (
+          <img
+            src={producto.imagenes[1]}
+            alt={producto.nombre}
+            class="absolute inset-0 w-full h-full object-cover object-center
+                 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            loading="lazy"
+          />
+        )
+      }
+
+      <!-- Badges -->
+      <div class="absolute top-3 left-3 flex flex-col gap-1">
+        {
+          descuento && (
+            <span class="tag bg-[#ff0000] text-bone border-0">
+              −{descuento}%
+            </span>
+          )
+        }
+        {producto.destacado && !descuento && <span class="tag bg-[#ff0000] text-bone border-0">Nuevo</span>}
+        {
+          !hayStock && (
+            <span class="tag bg-[#888888]/60 text-bone border-0">Agotado</span>
+          )
+        }
+      </div>
+
+      <!-- Quick add (hover) -->
+      <div
+        class="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"
+      >
+        <a
+          href={`/productos/${producto.slug}`}
+          class="block w-full bg-ink text-bone text-center py-2.5
+                 text-xs tracking-widest uppercase hover:bg-[#ff0000] transition-colors"
+          onclick="event.stopPropagation()"
+        >
+          Ver producto
+        </a>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="space-y-1.5">
+      {
+        producto.categoria && (
+          <p class="label-sm">{producto.categoria.nombre}</p>
+        )
+      }
+
+      <h3 class="text-sm leading-snug text-white group-hover:text-[#ff0000] transition-colors">
+        {producto.nombre}
+      </h3>
+
+      <!-- Colores disponibles -->
+      {
+        coloresUnicos.length > 0 && (
+          <div class="flex gap-1.5 py-0.5">
+            {coloresUnicos.slice(0, 6).map(({ color, hex }) => (
+              <span
+                class="w-3 h-3 rounded-full border border-dust/60"
+                style={`background-color: ${hex}`}
+                title={color}
+              />
+            ))}
+            {coloresUnicos.length > 6 && (
+              <span class="text-xs text-ash">+{coloresUnicos.length - 6}</span>
+            )}
+          </div>
+        )
+      }
+
+      <!-- Precio -->
+      <div class="flex items-baseline gap-2">
+        <span class="text-sm font-mono">{formatPrecio(precio)}</span>
+        {
+          precioOriginal && (
+            <span class="text-xs font-mono precio-original">
+              {formatPrecio(precioOriginal)}
+            </span>
+          )
+        }
+      </div>
+    </div>
+  </a>
+</article>

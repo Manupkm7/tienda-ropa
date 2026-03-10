@@ -1,0 +1,116 @@
+---
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+import { db } from '../../lib/db';
+import { ordenes, productos, clientes, variantes } from '../../lib/db/schema';
+import { eq, sql, gte, count } from 'drizzle-orm';
+
+// Stats
+const [
+  totalOrdenes,
+  ordenesPagadas,
+  totalProductos,
+  totalClientes,
+  ventasHoy,
+  stockBajo,
+  ordenesRecientes,
+] = await Promise.all([
+  db.select({ c: count() }).from(ordenes),
+  db.select({ total: sql<number>`SUM(total::numeric)` }).from(ordenes).where(eq(ordenes.estado, 'pagado')),
+  db.select({ c: count() }).from(productos).where(eq(productos.activo, true)),
+  db.select({ c: count() }).from(clientes),
+  db.select({ total: sql<number>`COALESCE(SUM(total::numeric), 0)` })
+    .from(ordenes)
+    .where(sql`DATE(creado_en) = CURRENT_DATE AND estado = 'pagado'`),
+  db.select({ c: count() }).from(variantes).where(sql`stock > 0 AND stock <= 3 AND activa = true`),
+  db.query.ordenes.findMany({
+    orderBy: (o, { desc }) => [desc(o.creadoEn)],
+    limit: 8,
+    with: { cliente: true },
+  }),
+]);
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+
+const fmtFecha = (d: Date) =>
+  new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(d);
+---
+
+<AdminLayout title="Dashboard">
+
+  <!-- Stats -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:32px;">
+    <div class="card">
+      <div class="stat-value">{fmt(parseFloat(String(ordenesPagadas[0]?.total ?? 0)))}</div>
+      <div class="stat-label">Ingresos totales</div>
+    </div>
+    <div class="card">
+      <div class="stat-value">{fmt(parseFloat(String(ventasHoy[0]?.total ?? 0)))}</div>
+      <div class="stat-label">Ventas hoy</div>
+    </div>
+    <div class="card">
+      <div class="stat-value">{totalOrdenes[0].c}</div>
+      <div class="stat-label">Total órdenes</div>
+    </div>
+    <div class="card">
+      <div class="stat-value">{totalProductos[0].c}</div>
+      <div class="stat-label">Productos activos</div>
+    </div>
+    <div class="card">
+      <div class="stat-value">{totalClientes[0].c}</div>
+      <div class="stat-label">Clientes</div>
+    </div>
+    {stockBajo[0].c > 0 && (
+      <div class="card" style="border-color: rgba(196,82,42,0.3);">
+        <div class="stat-value" style="color:#C4522A;">{stockBajo[0].c}</div>
+        <div class="stat-label" style="color:#C4522A;">Stock bajo (&le;3)</div>
+      </div>
+    )}
+  </div>
+
+  <!-- Órdenes recientes -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2 style="font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#555;">Órdenes recientes</h2>
+      <a href="/admin/ordenes" class="btn btn-ghost btn-sm">Ver todas</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Cliente</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Fecha</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {ordenesRecientes.map(orden => (
+          <tr>
+            <td style="font-family:monospace; color:#F5F2ED;">
+              #{String(orden.numero).padStart(4, '0')}
+            </td>
+            <td>
+              {orden.cliente ? `${orden.cliente.nombre} ${orden.cliente.apellido}` : '—'}
+              <div style="font-size:11px; color:#333; margin-top:2px;">{orden.cliente?.email}</div>
+            </td>
+            <td>
+              <span class={`badge badge-${orden.estado}`}>{orden.estado}</span>
+            </td>
+            <td style="font-family:monospace; color:#F5F2ED;">
+              {fmt(parseFloat(orden.total))}
+            </td>
+            <td style="font-size:11px;">
+              {fmtFecha(orden.creadoEn)}
+            </td>
+            <td>
+              <a href={`/admin/ordenes/${orden.id}`} class="btn btn-ghost btn-sm">Ver</a>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+</AdminLayout>

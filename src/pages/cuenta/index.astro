@@ -1,0 +1,263 @@
+---
+import CuentaLayout from '../../components/layout/CuentaLayout.astro';
+import { getClienteFromCookies } from '../../lib/userAuth';
+import { db } from '../../lib/db';
+import { ordenes } from '../../lib/db/schema';
+import { eq, desc } from 'drizzle-orm';
+
+const cliente = await getClienteFromCookies(Astro.cookies);
+if (!cliente) return Astro.redirect('/cuenta/login?next=/cuenta');
+
+// Historial de compras
+const misOrdenes = await db.query.ordenes.findMany({
+  where: eq(ordenes.clienteId, cliente.id),
+  orderBy: [desc(ordenes.creadoEn)],
+});
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+
+const fmtFecha = (d: Date) =>
+  new Intl.DateTimeFormat('es-AR', {
+    day: '2-digit', month: 'long', year: 'numeric'
+  }).format(d);
+
+const ESTADO_LABELS: Record<string, { label: string; color: string }> = {
+  pendiente:    { label: 'Pendiente de pago', color: 'text-amber-600 bg-amber-50 border-amber-200' },
+  pagado:       { label: 'Pago confirmado',   color: 'text-green-700 bg-green-50 border-green-200' },
+  procesando:   { label: 'En preparación',    color: 'text-blue-600 bg-blue-50 border-blue-200' },
+  empaquetado:  { label: 'Empaquetado',        color: 'text-blue-700 bg-blue-50 border-blue-200' },
+  enviado:      { label: 'En camino',          color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
+  entregado:    { label: 'Entregado',          color: 'text-green-700 bg-green-50 border-green-200' },
+  cancelado:    { label: 'Cancelado',          color: 'text-red-600 bg-red-50 border-red-200' },
+  reembolsado:  { label: 'Reembolsado',        color: 'text-gray-600 bg-gray-50 border-gray-200' },
+};
+
+// Progreso visual del pedido
+const PASOS_ESTADO = ['pagado', 'procesando', 'empaquetado', 'enviado', 'entregado'];
+
+function getPasoActual(estado: string): number {
+  const idx = PASOS_ESTADO.indexOf(estado);
+  return idx === -1 ? (estado === 'pendiente' ? -1 : 5) : idx;
+}
+---
+
+<CuentaLayout title="Mis compras">
+
+  {misOrdenes.length === 0 ? (
+    <!-- Estado vacío -->
+    <div class="text-center py-20">
+      <div class="text-6xl mb-6 text-dust">○</div>
+      <h2 class="text-xl font-light mb-3">Todavía no hiciste ninguna compra</h2>
+      <p class="text-sm text-ash mb-8">Cuando hagas tu primera compra la vas a ver acá.</p>
+      <a href="/productos" class="btn-primary inline-block">Ver catálogo</a>
+    </div>
+  ) : (
+    <div class="space-y-6">
+      <p class="text-sm text-ash">{misOrdenes.length} orden{misOrdenes.length !== 1 ? 'es' : ''}</p>
+
+      {misOrdenes.map(orden => {
+        const estadoInfo = ESTADO_LABELS[orden.estado] ?? { label: orden.estado, color: 'text-ash bg-[#888888]/30 border-dust' };
+        const pasoActual = getPasoActual(orden.estado);
+        const mostrarProgreso = !['cancelado', 'reembolsado', 'pendiente'].includes(orden.estado);
+        const primerItem = orden.items?.[0];
+
+        return (
+          <details class="group border border-dust" open={misOrdenes.indexOf(orden) === 0}>
+            <!-- Resumen (siempre visible) -->
+            <summary class="flex items-center gap-4 px-5 py-4 cursor-pointer list-none hover:bg-ink/[0.02] transition-colors">
+
+              <!-- Imagen del primer item -->
+              <div class="w-14 h-16 bg-[#888888] flex-shrink-0 overflow-hidden hidden sm:block">
+                {primerItem?.imagen ? (
+                  <img src={primerItem.imagen} alt={primerItem.nombre}
+                       class="w-full h-full object-cover" loading="lazy" />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center text-dust">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="20" height="18"/></svg>
+                  </div>
+                )}
+              </div>
+
+              <!-- Info principal -->
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <span class="text-sm font-mono">
+                    #{String(orden.numero).padStart(4, '0')}
+                  </span>
+                  <span class={`text-xs px-2 py-0.5 border ${estadoInfo.color}`}>
+                    {estadoInfo.label}
+                  </span>
+                </div>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-0.5 mt-1">
+                  <p class="text-xs text-ash">{fmtFecha(orden.creadoEn)}</p>
+                  <p class="text-xs text-ash">
+                    {(orden.items ?? []).reduce((s, i) => s + i.cantidad, 0)} artículo{(orden.items ?? []).reduce((s, i) => s + i.cantidad, 0) !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Total + flecha -->
+              <div class="flex items-center gap-4">
+                <span class="text-sm font-mono hidden sm:block">{fmt(parseFloat(orden.total))}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                     class="text-ash group-open:rotate-180 transition-transform flex-shrink-0">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </div>
+            </summary>
+
+            <!-- Detalle expandido -->
+            <div class="border-t border-dust px-5 py-5 space-y-6">
+
+              <!-- Barra de progreso del pedido -->
+              {mostrarProgreso && (
+                <div>
+                  <div class="flex justify-between mb-2">
+                    {PASOS_ESTADO.map((paso, i) => (
+                      <div class={`flex flex-col items-center gap-1 flex-1 ${i > 0 ? 'relative' : ''}`}>
+                        {/* Línea conectora */}
+                        {i > 0 && (
+                          <div class={`absolute left-0 top-2.5 w-full h-px -translate-x-1/2
+                            ${i <= pasoActual ? 'bg-ink' : 'bg-[#888888]'}`} />
+                        )}
+                        {/* Círculo */}
+                        <div class={`relative z-10 w-5 h-5 rounded-full border-2 flex items-center justify-center
+                          ${i < pasoActual ? 'bg-ink border-ink' :
+                            i === pasoActual ? 'bg-bone border-ink' :
+                            'bg-bone border-dust'}`}>
+                          {i < pasoActual && (
+                            <svg width="8" height="8" viewBox="0 0 12 12" fill="none" stroke="#F5F2ED" stroke-width="2">
+                              <path d="M2 6l3 3 5-5"/>
+                            </svg>
+                          )}
+                          {i === pasoActual && (
+                            <div class="w-2 h-2 bg-ink rounded-full" />
+                          )}
+                        </div>
+                        <span class={`text-[9px] tracking-wide uppercase text-center leading-tight hidden sm:block
+                          ${i <= pasoActual ? 'text-ink' : 'text-dust'}`}>
+                          {paso === 'pagado' ? 'Pagado' :
+                           paso === 'procesando' ? 'Preparando' :
+                           paso === 'empaquetado' ? 'Empaquetado' :
+                           paso === 'enviado' ? 'En camino' : 'Entregado'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <!-- Items -->
+              <div class="space-y-3">
+                <p class="label-sm">Artículos</p>
+                {(orden.items ?? []).map(item => (
+                  <div class="flex gap-4">
+                    <div class="w-14 h-16 bg-[#888888] flex-shrink-0 overflow-hidden">
+                      <img src={item.imagen || '/images/placeholder.jpg'}
+                           alt={item.nombre} class="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                    <div class="flex-1">
+                      <a href={`/productos/${item.productoId}`}
+                         class="text-sm hover:text-rust transition-colors leading-tight">
+                        {item.nombre}
+                      </a>
+                      {(item.color || item.talla) && (
+                        <p class="text-xs text-ash mt-0.5">
+                          {[item.color, item.talla].filter(Boolean).join(' / ')}
+                        </p>
+                      )}
+                      <p class="text-xs text-ash mt-0.5">Cantidad: {item.cantidad}</p>
+                    </div>
+                    <p class="text-sm font-mono flex-shrink-0">{fmt(item.precio * item.cantidad)}</p>
+                  </div>
+                ))}
+              </div>
+
+              <!-- Totales + envío -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-dust">
+
+                <!-- Info envío -->
+                {orden.datosEnvio && (
+                  <div>
+                    <p class="label-sm mb-2">Envío</p>
+                    <div class="text-sm text-ash space-y-0.5">
+                      {orden.datosEnvio.metodo === 'retiro' ? (
+                        <p>Retiro en local</p>
+                      ) : (
+                        <>
+                          <p class="capitalize text-ink">{orden.datosEnvio.metodo} — {orden.datosEnvio.servicio}</p>
+                          <p>{orden.datosEnvio.nombreDestinatario}</p>
+                          <p>
+                            {orden.datosEnvio.direccion.calle} {orden.datosEnvio.direccion.numero}
+                            {orden.datosEnvio.direccion.piso ? `, Piso ${orden.datosEnvio.direccion.piso}` : ''}
+                          </p>
+                          <p>{orden.datosEnvio.direccion.ciudad}, {orden.datosEnvio.direccion.provincia}</p>
+                        </>
+                      )}
+                      {orden.datosEnvio.trackingId && (
+                        <div class="mt-3 p-3 bg-[#888888]/20 border border-dust">
+                          <p class="label-sm mb-1">Número de seguimiento</p>
+                          <p class="font-mono text-xs text-ink">{orden.datosEnvio.trackingId}</p>
+                          {orden.datosEnvio.metodo === 'andreani' && (
+                            <a
+                              href={`https://www.andreani.com/personas/seguimiento?codigoEnvio=${orden.datosEnvio.trackingId}`}
+                              target="_blank"
+                              class="text-xs text-rust underline underline-offset-2 mt-1 inline-block"
+                            >
+                              Rastrear en Andreani →
+                            </a>
+                          )}
+                          {orden.datosEnvio.metodo === 'oca' && (
+                            <a
+                              href={`https://www.oca.com.ar/seguimiento?numeroPieza=${orden.datosEnvio.trackingId}`}
+                              target="_blank"
+                              class="text-xs text-rust underline underline-offset-2 mt-1 inline-block"
+                            >
+                              Rastrear en OCA →
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <!-- Resumen de costos -->
+                <div>
+                  <p class="label-sm mb-2">Resumen</p>
+                  <div class="space-y-1.5 text-sm">
+                    <div class="flex justify-between">
+                      <span class="text-ash">Subtotal</span>
+                      <span class="font-mono">{fmt(parseFloat(orden.subtotal))}</span>
+                    </div>
+                    {parseFloat(orden.costoEnvio ?? '0') > 0 && (
+                      <div class="flex justify-between">
+                        <span class="text-ash">Envío</span>
+                        <span class="font-mono">{fmt(parseFloat(orden.costoEnvio!))}</span>
+                      </div>
+                    )}
+                    <div class="flex justify-between font-medium pt-2 border-t border-dust">
+                      <span>Total</span>
+                      <span class="font-mono">{fmt(parseFloat(orden.total))}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ayuda -->
+              <div class="text-center">
+                <a href={`/contacto?orden=${String(orden.numero).padStart(4, '0')}`}
+                   class="text-xs text-ash hover:text-ink transition-colors underline underline-offset-2">
+                  ¿Tenés algún problema con esta orden? Contactanos
+                </a>
+              </div>
+
+            </div>
+          </details>
+        );
+      })}
+    </div>
+  )}
+
+</CuentaLayout>

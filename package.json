@@ -1,0 +1,42 @@
+{
+  "name": "tienda-indumentaria",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@astrojs/node": "^8.3.0",
+    "@astrojs/react": "^3.6.0",
+    "@astrojs/tailwind": "^5.1.0",
+    "@nanostores/persistent": "^0.10.0",
+    "@nanostores/react": "^0.7.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "astro": "^4.16.0",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.0",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.36.0",
+    "lucide-react": "^0.460.0",
+    "mercadopago": "^2.3.0",
+    "nanostores": "^0.11.0",
+    "postgres": "^3.4.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.0",
+    "drizzle-kit": "^0.28.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.6.0"
+  }
+}

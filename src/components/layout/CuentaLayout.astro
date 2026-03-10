@@ -1,0 +1,64 @@
+---
+import Layout from '../layout/Layout.astro';
+import { getClienteFromCookies } from '../../lib/userAuth';
+
+interface Props {
+  title: string;
+  requireAuth?: boolean;
+}
+
+const { title, requireAuth = true } = Astro.props;
+
+const cliente = await getClienteFromCookies(Astro.cookies);
+
+if (requireAuth && !cliente) {
+  return Astro.redirect(`/cuenta/login?next=${encodeURIComponent(Astro.url.pathname)}`);
+}
+
+const nav = [
+  { href: '/cuenta', label: 'Mis compras' },
+  { href: '/cuenta/perfil', label: 'Mi perfil' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<Layout title={title}>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+
+    <!-- Header cuenta -->
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <p class="label-sm mb-1">Mi cuenta</p>
+        {cliente && (
+          <h1 class="text-2xl font-light">Hola, {cliente.nombre}</h1>
+        )}
+      </div>
+      {cliente && (
+        <a href="/api/auth/logout" class="text-xs text-ash hover:text-rust transition-colors">
+          Cerrar sesión
+        </a>
+      )}
+    </div>
+
+    <!-- Nav tabs -->
+    {cliente && (
+      <nav class="flex gap-0 border-b border-dust mb-10">
+        {nav.map(({ href, label }) => (
+          <a
+            href={href}
+            class={`px-6 py-3 text-xs tracking-widest uppercase border-b-2 transition-colors duration-150 ${
+              currentPath === href
+                ? 'border-ink text-ink'
+                : 'border-transparent text-ash hover:text-ink'
+            }`}
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+    )}
+
+    <slot />
+  </div>
+</Layout>

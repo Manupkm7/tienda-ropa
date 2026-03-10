@@ -1,0 +1,164 @@
+---
+import Layout from '../../components/layout/Layout.astro';
+import ProductoCard from '../../components/catalogo/ProductoCard.astro';
+import FiltrosSidebar from '../../components/catalogo/FiltrosSidebar';
+import { obtenerProductos, obtenerColoresDisponibles, obtenerTallasDisponibles } from '../../lib/productos';
+import { db } from '../../lib/db';
+import { categorias } from '../../lib/db/schema';
+import { eq } from 'drizzle-orm';
+
+// Parsear query params
+const params = Astro.url.searchParams;
+
+const filtros = {
+  categoria: params.get('categoria') ?? undefined,
+  genero: params.get('genero') ?? undefined,
+  colores: params.get('colores') ? params.get('colores')!.split(',') : undefined,
+  tallas: params.get('tallas') ? params.get('tallas')!.split(',') : undefined,
+  precioMin: params.get('precioMin') ? Number(params.get('precioMin')) : undefined,
+  precioMax: params.get('precioMax') ? Number(params.get('precioMax')) : undefined,
+  busqueda: params.get('busqueda') ?? undefined,
+  soloConStock: params.get('soloConStock') === 'true',
+  orden: (params.get('orden') as any) ?? 'nuevo',
+  pagina: params.get('pagina') ? Number(params.get('pagina')) : 1,
+  porPagina: 12,
+};
+
+const [resultado, cats, colores, tallas] = await Promise.all([
+  obtenerProductos(filtros),
+  db.query.categorias.findMany({ where: eq(categorias.activa, true), orderBy: (c, { asc }) => [asc(c.orden)] }),
+  obtenerColoresDisponibles(),
+  obtenerTallasDisponibles(),
+]);
+
+const { productos, total, paginas, pagina } = resultado;
+
+// Build URL helper para paginación
+function pageUrl(p: number) {
+  const u = new URL(Astro.url);
+  u.searchParams.set('pagina', String(p));
+  return u.toString();
+}
+
+const titulo = filtros.categoria
+  ? cats.find(c => c.slug === filtros.categoria)?.nombre ?? 'Catálogo'
+  : 'Todo';
+
+// Ítems de paginación (evitar <= en el template para que Astro no lo confunda con un tag)
+const paginationItems = Array.from({ length: paginas }, (_, i) => i + 1).map(p => {
+  const mostrar = p === 1 || p === paginas || Math.abs(p - pagina) <= 1;
+  const ellipsis = !mostrar && (p === 2 || p === paginas - 1);
+  return { p, mostrar, ellipsis };
+});
+---
+<Layout title={titulo} description={`${titulo} — Indumentaria de diseño`}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+
+    <!-- Page header -->
+    <div class="mb-10">
+      <p class="label-sm mb-2">Catálogo</p>
+      <h1 class="text-3xl font-light tracking-tight">{titulo}</h1>
+    </div>
+
+    <!-- Búsqueda rápida -->
+    <form method="get" action="/productos" class="mb-8">
+      {Object.entries(filtros).filter(([k, v]) => k !== 'busqueda' && v).map(([k, v]) => (
+        <input type="hidden" name={k} value={Array.isArray(v) ? v.join(',') : String(v)} />
+      ))}
+      <div class="flex gap-0 max-w-md">
+        <input
+          type="text"
+          name="busqueda"
+          placeholder="Buscar productos..."
+          value={filtros.busqueda ?? ''}
+          class="input-field flex-1"
+        />
+        <button type="submit" class="bg-ink text-bone px-5 hover:bg-rust transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </div>
+    </form>
+
+    <div class="flex gap-10">
+      <!-- Sidebar filtros — React island -->
+      <FiltrosSidebar
+        client:load
+        categorias={cats}
+        colores={colores}
+        tallas={tallas}
+        filtrosActivos={filtros}
+        total={total}
+      />
+
+      <!-- Grilla de productos -->
+      <div class="flex-1 min-w-0">
+
+        <!-- Mobile: ordenar rápido -->
+        <div class="lg:hidden mb-4 flex justify-end">
+          <select
+            class="text-xs font-mono border border-dust px-3 py-2 bg-bone focus:outline-none focus:border-ink"
+            onchange="window.location.href = '/productos?' + new URLSearchParams({...Object.fromEntries(new URLSearchParams(window.location.search)), orden: this.value}).toString()"
+          >
+            <option value="nuevo" selected={filtros.orden === 'nuevo'}>Más reciente</option>
+            <option value="precio_asc" selected={filtros.orden === 'precio_asc'}>Precio ↑</option>
+            <option value="precio_desc" selected={filtros.orden === 'precio_desc'}>Precio ↓</option>
+            <option value="destacado" selected={filtros.orden === 'destacado'}>Destacados</option>
+          </select>
+        </div>
+
+        {productos.length === 0 ? (
+          <div class="text-center py-24">
+            <p class="text-ash mb-4">No encontramos productos con esos filtros.</p>
+            <a href="/productos" class="btn-outline inline-block">Ver todo el catálogo</a>
+          </div>
+        ) : (
+          <>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-10">
+              {productos.map((prod, i) => (
+                <ProductoCard producto={prod} index={i} />
+              ))}
+            </div>
+
+            <!-- Paginación -->
+            {paginas > 1 && (
+              <nav class="mt-16 flex justify-center items-center gap-1" aria-label="Paginación">
+                {pagina > 1 && (
+                  <a href={pageUrl(pagina - 1)}
+                     class="w-10 h-10 flex items-center justify-center border border-dust hover:border-ink text-ash hover:text-ink transition-colors text-xs">
+                    ←
+                  </a>
+                )}
+
+                {paginationItems.map(({ p, mostrar, ellipsis }) => {
+                  if (ellipsis) return <span class="text-ash text-xs px-1">…</span>;
+                  if (!mostrar) return null;
+                  return (
+                    <a
+                      href={pageUrl(p)}
+                      class={`w-10 h-10 flex items-center justify-center border text-xs font-mono transition-colors
+                        ${p === pagina
+                          ? 'bg-ink text-bone border-ink'
+                          : 'border-dust hover:border-ink text-ash hover:text-ink'
+                        }`}
+                    >
+                      {p}
+                    </a>
+                  );
+                })}
+
+                {pagina < paginas && (
+                  <a href={pageUrl(pagina + 1)}
+                     class="w-10 h-10 flex items-center justify-center border border-dust hover:border-ink text-ash hover:text-ink transition-colors text-xs">
+                    →
+                  </a>
+                )}
+              </nav>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>

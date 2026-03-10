@@ -1,0 +1,63 @@
+---
+import Layout from '../../components/layout/Layout.astro';
+import { getClienteFromCookies } from '../../lib/userAuth';
+
+const cliente = await getClienteFromCookies(Astro.cookies);
+if (cliente) return Astro.redirect('/cuenta');
+
+const error = Astro.url.searchParams.get('error');
+const msg = Astro.url.searchParams.get('msg');
+const next = Astro.url.searchParams.get('next') ?? '/cuenta';
+---
+
+<Layout title="Iniciar sesión">
+  <div class="max-w-md mx-auto px-4 py-20">
+
+    <div class="mb-10 text-center">
+      <p class="label-sm mb-3">Mi cuenta</p>
+      <h1 class="text-3xl font-light">Iniciar sesión</h1>
+    </div>
+
+    {error && (
+      <div class="border border-rust/30 bg-rust/5 text-rust text-sm px-4 py-3 mb-6">
+        {decodeURIComponent(error)}
+      </div>
+    )}
+    {msg === 'logout' && (
+      <div class="border border-dust text-ash text-sm px-4 py-3 mb-6">
+        Sesión cerrada correctamente.
+      </div>
+    )}
+
+    <form method="POST" action="/api/auth/login" class="space-y-5">
+      <input type="hidden" name="next" value={next} />
+
+      <div>
+        <label class="label-sm block mb-2">Email</label>
+        <input name="email" type="email" class="input-field" required autocomplete="email" />
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="label-sm">Contraseña</label>
+          <a href="/cuenta/recuperar" class="text-xs text-ash hover:text-ink transition-colors">
+            Olvidé mi contraseña
+          </a>
+        </div>
+        <input name="password" type="password" class="input-field" required autocomplete="current-password" />
+      </div>
+
+      <button type="submit" class="btn-primary w-full">Ingresar</button>
+    </form>
+
+    <div class="divider" />
+
+    <p class="text-center text-sm text-ash">
+      ¿No tenés cuenta?{' '}
+      <a href="/cuenta/registro" class="text-ink underline underline-offset-4 hover:text-rust transition-colors">
+        Registrarse
+      </a>
+    </p>
+
+  </div>
+</Layout>

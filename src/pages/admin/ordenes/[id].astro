@@ -1,0 +1,181 @@
+---
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { db } from '../../../lib/db';
+import { ordenes } from '../../../lib/db/schema';
+import { eq } from 'drizzle-orm';
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/admin/ordenes');
+
+const orden = await db.query.ordenes.findFirst({
+  where: eq(ordenes.id, id),
+  with: { cliente: true },
+});
+
+if (!orden) return Astro.redirect('/admin/ordenes');
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+
+const ESTADOS_SIGUIENTES: Record<string, string[]> = {
+  pendiente:    ['pagado', 'cancelado'],
+  pagado:       ['procesando', 'cancelado'],
+  procesando:   ['empaquetado', 'cancelado'],
+  empaquetado:  ['enviado'],
+  enviado:      ['entregado'],
+  entregado:    [],
+  cancelado:    ['reembolsado'],
+  reembolsado:  [],
+};
+
+const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
+---
+
+<AdminLayout title={`Orden #${String(orden.numero).padStart(4, '0')}`}>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+    <a href="/admin/ordenes" style="font-size:12px; color:#555;">← Volver a órdenes</a>
+    <div style="display:flex; gap:8px;">
+      {siguientes.map(sig => (
+        <form method="POST" action={`/api/admin/ordenes/${orden.id}/estado`}>
+          <input type="hidden" name="estado" value={sig} />
+          <button type="submit" class={`btn btn-sm ${sig === 'cancelado' ? 'btn-danger' : 'btn-primary'}`}>
+            → {sig}
+          </button>
+        </form>
+      ))}
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;">
+
+    <!-- Izquierda -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <!-- Items -->
+      <div class="card">
+        <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;">
+          Items del pedido
+        </h3>
+        {(orden.items ?? []).map(item => (
+          <div style="display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #1a1a1a; last:border:none;">
+            <div style="width:56px; height:70px; background:#1a1a1a; flex-shrink:0; overflow:hidden;">
+              <img src={item.imagen || '/images/placeholder.jpg'} alt={item.nombre}
+                   style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:13px; color:#F5F2ED;">{item.nombre}</div>
+              {(item.color || item.talla) && (
+                <div style="font-size:11px; color:#555; margin-top:2px;">
+                  {[item.color, item.talla].filter(Boolean).join(' / ')}
+                </div>
+              )}
+              {item.sku && <div style="font-size:10px; color:#333; font-family:monospace;">SKU: {item.sku}</div>}
+            </div>
+            <div style="text-align:right; flex-shrink:0;">
+              <div style="font-size:13px; color:#F5F2ED; font-family:monospace;">{fmt(item.precio * item.cantidad)}</div>
+              <div style="font-size:11px; color:#555;">×{item.cantidad} × {fmt(item.precio)}</div>
+            </div>
+          </div>
+        ))}
+
+        <div style="margin-top:16px; padding-top:16px; border-top:1px solid #1a1a1a; space-y:8px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#555; margin-bottom:6px;">
+            <span>Subtotal</span><span style="font-family:monospace;">{fmt(parseFloat(orden.subtotal))}</span>
+          </div>
+          {parseFloat(orden.costoEnvio ?? '0') > 0 && (
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:#555; margin-bottom:6px;">
+              <span>Envío</span><span style="font-family:monospace;">{fmt(parseFloat(orden.costoEnvio!))}</span>
+            </div>
+          )}
+          <div style="display:flex; justify-content:space-between; font-size:14px; color:#F5F2ED; font-weight:500; margin-top:8px; padding-top:8px; border-top:1px solid #1a1a1a;">
+            <span>Total</span><span style="font-family:monospace;">{fmt(parseFloat(orden.total))}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notas -->
+      {(orden.notasCliente || orden.notasAdmin) && (
+        <div class="card">
+          <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:12px;">Notas</h3>
+          {orden.notasCliente && (
+            <div style="margin-bottom:12px;">
+              <div style="font-size:10px; color:#333; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.1em;">Del cliente</div>
+              <p style="font-size:13px; color:#aaa;">{orden.notasCliente}</p>
+            </div>
+          )}
+          {orden.notasAdmin && (
+            <div>
+              <div style="font-size:10px; color:#333; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.1em;">Admin</div>
+              <p style="font-size:13px; color:#aaa;">{orden.notasAdmin}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <!-- Nota admin form -->
+      <div class="card">
+        <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:12px;">Agregar nota interna</h3>
+        <form method="POST" action={`/api/admin/ordenes/${orden.id}/nota`} style="display:flex; gap:8px;">
+          <textarea name="nota" class="input" rows="2" placeholder="Nota interna..." style="resize:none; flex:1;"></textarea>
+          <button type="submit" class="btn btn-primary" style="align-self:flex-end;">Guardar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Derecha -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+
+      <!-- Estado -->
+      <div class="card">
+        <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:12px;">Estado</h3>
+        <span class={`badge badge-${orden.estado}`} style="font-size:12px; padding:4px 12px;">{orden.estado}</span>
+        {orden.mercadoPagoId && (
+          <div style="margin-top:12px; font-size:11px; color:#333;">
+            MP ID: <span style="font-family:monospace;">{orden.mercadoPagoId}</span>
+          </div>
+        )}
+      </div>
+
+      <!-- Cliente -->
+      {orden.cliente && (
+        <div class="card">
+          <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:12px;">Cliente</h3>
+          <div style="font-size:13px; color:#F5F2ED;">{orden.cliente.nombre} {orden.cliente.apellido}</div>
+          <div style="font-size:12px; color:#555; margin-top:4px;">{orden.cliente.email}</div>
+          {orden.cliente.telefono && (
+            <div style="font-size:12px; color:#555; margin-top:2px;">{orden.cliente.telefono}</div>
+          )}
+        </div>
+      )}
+
+      <!-- Envío -->
+      {orden.datosEnvio && (
+        <div class="card">
+          <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:12px;">Envío</h3>
+          <div style="font-size:12px; color:#aaa; line-height:1.7;">
+            <div style="color:#F5F2ED; margin-bottom:6px; text-transform:capitalize;">{orden.datosEnvio.metodo}</div>
+            <div>{orden.datosEnvio.nombreDestinatario}</div>
+            <div>{orden.datosEnvio.direccion.calle} {orden.datosEnvio.direccion.numero}</div>
+            <div>{orden.datosEnvio.direccion.ciudad}, {orden.datosEnvio.direccion.provincia}</div>
+            <div>CP {orden.datosEnvio.direccion.codigoPostal}</div>
+            {orden.datosEnvio.trackingId && (
+              <div style="margin-top:8px; font-family:monospace; color:#555;">
+                Tracking: {orden.datosEnvio.trackingId}
+              </div>
+            )}
+          </div>
+          {orden.datosEnvio.metodo !== 'retiro' && (
+            <form method="POST" action={`/api/admin/ordenes/${orden.id}/tracking`} style="margin-top:12px;">
+              <input type="text" name="trackingId" class="input" placeholder="Número de seguimiento"
+                     value={orden.datosEnvio.trackingId ?? ''} style="margin-bottom:8px;" />
+              <button type="submit" class="btn btn-ghost btn-sm" style="width:100%;">Guardar tracking</button>
+            </form>
+          )}
+        </div>
+      )}
+
+    </div>
+  </div>
+
+</AdminLayout>
