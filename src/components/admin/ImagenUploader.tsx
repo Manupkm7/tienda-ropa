@@ -4,7 +4,8 @@
  *
  * Props:
  *  - value: string[]          lista actual de URLs públicas
- *  - onChange: (urls) => void  callback al cambiar
+ *  - onChange?: (urls) => void callback al cambiar (opcional si se usa hiddenInputId)
+ *  - hiddenInputId?: string   id del input hidden a sincronizar con JSON de URLs (para formularios Astro)
  *  - productoSlug?: string     para organizar en subcarpeta del bucket
  *  - max?: number              máximo de imágenes (default: 6)
  */
@@ -13,7 +14,8 @@ import { Upload, X, GripVertical, Loader, AlertCircle, Image } from 'lucide-reac
 
 interface Props {
   value: string[];
-  onChange: (urls: string[]) => void;
+  onChange?: (urls: string[]) => void;
+  hiddenInputId?: string;
   productoSlug?: string;
   max?: number;
 }
@@ -26,10 +28,18 @@ interface EstadoSubida {
   url?: string;
 }
 
-export default function ImagenUploader({ value = [], onChange, productoSlug, max = 6 }: Props) {
+export default function ImagenUploader({ value = [], onChange, hiddenInputId, productoSlug, max = 6 }: Props) {
   const [subiendo, setSubiendo] = useState<EstadoSubida[]>([]);
   const [arrastrando, setArrastrando] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const notifyChange = useCallback((urls: string[]) => {
+    onChange?.(urls);
+    if (hiddenInputId) {
+      const el = document.getElementById(hiddenInputId);
+      if (el && 'value' in el) (el as HTMLInputElement).value = JSON.stringify(urls);
+    }
+  }, [onChange, hiddenInputId]);
 
   const subirArchivos = useCallback(async (files: FileList | File[]) => {
     const lista = Array.from(files).filter(f => f.type.startsWith('image/'));
@@ -82,7 +92,7 @@ export default function ImagenUploader({ value = [], onChange, productoSlug, max
         ));
 
         // Agregar URL al listado
-        onChange([...value, data.url]);
+        notifyChange([...value, data.url]);
 
         // Limpiar estado después de 1 segundo
         setTimeout(() => {
@@ -95,7 +105,7 @@ export default function ImagenUploader({ value = [], onChange, productoSlug, max
         ));
       }
     }));
-  }, [value, onChange, productoSlug, max]);
+  }, [value, notifyChange, productoSlug, max]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -110,7 +120,7 @@ export default function ImagenUploader({ value = [], onChange, productoSlug, max
       ? url.split('/storage/v1/object/public/productos/').at(-1)
       : url;
 
-    onChange(value.filter((_, i) => i !== index));
+    notifyChange(value.filter((_, i) => i !== index));
 
     // Eliminar de Supabase Storage en background (best effort)
     if (path && path !== url) {
@@ -126,7 +136,7 @@ export default function ImagenUploader({ value = [], onChange, productoSlug, max
     const next = [...value];
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
-    onChange(next);
+    notifyChange(next);
   };
 
   const hayLugar = value.length + subiendo.filter(s => !s.error && !s.url).length < max;
@@ -289,7 +299,7 @@ export default function ImagenUploader({ value = [], onChange, productoSlug, max
                 e.preventDefault();
                 const val = (e.target as HTMLInputElement).value.trim();
                 if (val && !value.includes(val)) {
-                  onChange([...value, val]);
+                  notifyChange([...value, val]);
                   (e.target as HTMLInputElement).value = '';
                 }
               }
@@ -301,7 +311,7 @@ export default function ImagenUploader({ value = [], onChange, productoSlug, max
               const input = document.getElementById('manual-url-input') as HTMLInputElement;
               const val = input?.value.trim();
               if (val && !value.includes(val)) {
-                onChange([...value, val]);
+                notifyChange([...value, val]);
                 input.value = '';
               }
             }}

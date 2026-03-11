@@ -1,7 +1,7 @@
 ---
-import AdminLayout from '../../components/admin/AdminLayout.astro';
-import { db } from '../../lib/db';
-import { productos, variantes } from '../../lib/db/schema';
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { db } from '../../../lib/db';
+import { productos, variantes } from '../../../lib/db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 
 const todos = await db.query.productos.findMany({
@@ -14,6 +14,12 @@ const todos = await db.query.productos.findMany({
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+
+const productosConStock = todos.map(prod => {
+  const stockTotal = prod.variantes.reduce((s, v) => s + v.stock, 0);
+  const stockBajo = stockTotal > 0 && stockTotal <= 5;
+  return { ...prod, stockTotal, stockBajo };
+});
 ---
 
 <AdminLayout title="Productos">
@@ -36,9 +42,7 @@ const fmt = (n: number) =>
         </tr>
       </thead>
       <tbody>
-        {todos.map(prod => {
-          const stockTotal = prod.variantes.reduce((s, v) => s + v.stock, 0);
-          const stockBajo = stockTotal > 0 && stockTotal <= 5;
+        {productosConStock.map(prod => {
           return (
             <tr>
               <td>
@@ -63,8 +67,8 @@ const fmt = (n: number) =>
                 )}
               </td>
               <td>
-                <span style={`font-family:monospace; font-size:13px; color:${stockTotal === 0 ? '#C4522A' : stockBajo ? '#b49a00' : '#F5F2ED'};`}>
-                  {stockTotal}
+                <span style={`font-family:monospace; font-size:13px; color:${prod.stockTotal === 0 ? '#C4522A' : prod.stockBajo ? '#b49a00' : '#F5F2ED'};`}>
+                  {prod.stockTotal}
                 </span>
                 <span style="font-size:10px; color:#333; margin-left:4px;">
                   ({prod.variantes.length} vars)

@@ -1,12 +1,12 @@
 ---
-import AdminLayout from '../../../components/admin/AdminLayout.astro';
-import ImagenUploader from '../../../components/admin/ImagenUploader';
-import { db } from '../../../lib/db';
-import { productos, variantes, categorias } from '../../../lib/db/schema';
-import { eq } from 'drizzle-orm';
+import AdminLayout from "../../../components/admin/AdminLayout.astro";
+import ImagenUploader from "../../../components/admin/ImagenUploader";
+import { db } from "../../../lib/db";
+import { productos, variantes, categorias } from "../../../lib/db/schema";
+import { eq } from "drizzle-orm";
 
 const { id } = Astro.params;
-const esNuevo = id === 'nuevo';
+const esNuevo = id === "nuevo";
 
 let producto = null;
 if (!esNuevo) {
@@ -14,7 +14,7 @@ if (!esNuevo) {
     where: eq(productos.id, parseInt(id!)),
     with: { variantes: true },
   });
-  if (!producto) return Astro.redirect('/admin/productos');
+  if (!producto) return Astro.redirect("/admin/productos");
 }
 
 const cats = await db.query.categorias.findMany({
@@ -22,60 +22,119 @@ const cats = await db.query.categorias.findMany({
   orderBy: (c, { asc }) => [asc(c.orden)],
 });
 
-const success = Astro.url.searchParams.get('success');
+const success = Astro.url.searchParams.get("success");
 ---
 
-<AdminLayout title={esNuevo ? 'Nuevo producto' : `Editar: ${producto?.nombre}`}>
+<AdminLayout title={esNuevo ? "Nuevo producto" : `Editar: ${producto?.nombre}`}>
+  <a
+    href="/admin/productos"
+    style="font-size:12px; color:#555; display:inline-block; margin-bottom:24px;"
+    >← Volver</a
+  >
 
-  <a href="/admin/productos" style="font-size:12px; color:#555; display:inline-block; margin-bottom:24px;">← Volver</a>
+  {
+    success && (
+      <div
+        style="background:rgba(0,160,80,0.1); border:1px solid rgba(0,160,80,0.3); color:#00a050;
+                padding:10px 16px; font-size:12px; margin-bottom:20px;"
+      >
+        ✓ Producto guardado correctamente
+      </div>
+    )
+  }
 
-  {success && (
-    <div style="background:rgba(0,160,80,0.1); border:1px solid rgba(0,160,80,0.3); color:#00a050;
-                padding:10px 16px; font-size:12px; margin-bottom:20px;">
-      ✓ Producto guardado correctamente
-    </div>
-  )}
-
-  <form method="POST" action={`/api/admin/productos/${esNuevo ? 'crear' : producto?.id}`}
-        style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;">
-
+  <form
+    method="POST"
+    action={`/api/admin/productos/${esNuevo ? "crear" : producto?.id}`}
+    style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;"
+  >
     <!-- Principal -->
     <div style="display:flex; flex-direction:column; gap:20px;">
-
       <div class="card">
-        <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;">Información básica</h3>
+        <h3
+          style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;"
+        >
+          Información básica
+        </h3>
         <div style="display:grid; gap:14px;">
           <div>
-            <label style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;">Nombre *</label>
-            <input name="nombre" type="text" class="input" required value={producto?.nombre ?? ''} placeholder="Remera Oversized" />
+            <label
+              style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;"
+              >Nombre *</label
+            >
+            <input
+              name="nombre"
+              type="text"
+              class="input"
+              required
+              value={producto?.nombre ?? ""}
+              placeholder="Remera Oversized"
+            />
           </div>
           <div>
-            <label style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;">Slug *</label>
-            <input name="slug" type="text" class="input" required value={producto?.slug ?? ''} placeholder="remera-oversized" />
-            <p style="font-size:10px; color:#333; margin-top:4px;">URL del producto. Usar solo letras, números y guiones.</p>
+            <label
+              style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;"
+              >Slug *</label
+            >
+            <input
+              name="slug"
+              type="text"
+              class="input"
+              required
+              value={producto?.slug ?? ""}
+              placeholder="remera-oversized"
+            />
+            <p style="font-size:10px; color:#333; margin-top:4px;">
+              URL del producto. Usar solo letras, números y guiones.
+            </p>
           </div>
           <div>
-            <label style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;">Descripción corta</label>
-            <input name="descripcionCorta" type="text" class="input" value={producto?.descripcionCorta ?? ''} placeholder="Tagline del producto" />
+            <label
+              style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;"
+              >Descripción corta</label
+            >
+            <input
+              name="descripcionCorta"
+              type="text"
+              class="input"
+              value={producto?.descripcionCorta ?? ""}
+              placeholder="Tagline del producto"
+            />
           </div>
           <div>
-            <label style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;">Descripción completa</label>
-            <textarea name="descripcion" class="input" rows="4" style="resize:vertical;">{producto?.descripcion ?? ''}</textarea>
+            <label
+              style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;"
+              >Descripción completa</label
+            >
+            <textarea
+              name="descripcion"
+              class="input"
+              rows="4"
+              style="resize:vertical;">{producto?.descripcion ?? ""}</textarea
+            >
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;">Imágenes</h3>
+        <h3
+          style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;"
+        >
+          Imágenes
+        </h3>
         <!-- Input oculto que recibe las URLs del uploader -->
-        <input type="hidden" name="imagenesJson" id="imagenes-json-input"
-               value={JSON.stringify(producto?.imagenes ?? [])} />
+        <input
+          type="hidden"
+          name="imagenesJson"
+          id="imagenes-json-input"
+          value={JSON.stringify(producto?.imagenes ?? [])}
+        />
         <!-- Uploader React island -->
         <ImagenUploader
           client:load
           value={producto?.imagenes ?? []}
           productoSlug={producto?.slug}
-          onChange={`(urls) => { document.getElementById('imagenes-json-input').value = JSON.stringify(urls); }`}
+          hiddenInputId="imagenes-json-input"
         />
         <p style="font-size:10px; color:#333; margin-top:8px;">
           La primera imagen es la principal. Arrastrá para reordenar.
@@ -84,110 +143,278 @@ const success = Astro.url.searchParams.get('success');
 
       <!-- Variantes -->
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444;">Variantes (color + talle + stock)</h3>
-          <button type="button" id="add-variante" class="btn btn-ghost btn-sm">+ Variante</button>
+        <div
+          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;"
+        >
+          <h3
+            style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444;"
+          >
+            Variantes (color + talle + stock)
+          </h3>
+          <button type="button" id="add-variante" class="btn btn-ghost btn-sm"
+            >+ Variante</button
+          >
         </div>
         <div id="variantes-container">
-          {(producto?.variantes ?? [{ color: '', codigoHex: '', talla: '', stock: 0, sku: '', precioExtra: 0 }]).map((v, i) => (
-            <div class="variante-row" style="display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px; margin-bottom:8px; align-items:center;">
-              <input name={`v_color_${i}`} class="input" value={(v as any).color ?? ''} placeholder="Color" />
-              <input name={`v_hex_${i}`} class="input" value={(v as any).codigoHex ?? ''} placeholder="#000000" />
-              <input name={`v_talla_${i}`} class="input" value={(v as any).talla ?? ''} placeholder="M" style="text-align:center;" />
-              <input name={`v_stock_${i}`} class="input" type="number" min="0" value={(v as any).stock ?? 0} placeholder="Stock" />
-              <input name={`v_sku_${i}`} class="input" value={(v as any).sku ?? ''} placeholder="SKU" />
-              <input name={`v_extra_${i}`} class="input" type="number" min="0" value={(v as any).precioExtra ?? 0} placeholder="+$" />
-              <input type="hidden" name={`v_id_${i}`} value={(v as any).id ?? ''} />
-              <button type="button" class="btn btn-danger btn-sm remove-variante" style="flex-shrink:0;">✕</button>
-            </div>
-          ))}
+          {
+            (
+              producto?.variantes ?? [
+                {
+                  color: "",
+                  codigoHex: "",
+                  talla: "",
+                  stock: 0,
+                  sku: "",
+                  precioExtra: 0,
+                },
+              ]
+            ).map((v, i) => (
+              <div
+                class="variante-row"
+                style="display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px; margin-bottom:8px; align-items:center;"
+              >
+                <input
+                  name={`v_color_${i}`}
+                  class="input"
+                  value={(v as any).color ?? ""}
+                  placeholder="Color"
+                />
+                <input
+                  name={`v_hex_${i}`}
+                  class="input"
+                  value={(v as any).codigoHex ?? ""}
+                  placeholder="#000000"
+                />
+                <input
+                  name={`v_talla_${i}`}
+                  class="input"
+                  value={(v as any).talla ?? ""}
+                  placeholder="M"
+                  style="text-align:center;"
+                />
+                <input
+                  name={`v_stock_${i}`}
+                  class="input"
+                  type="number"
+                  min="0"
+                  value={(v as any).stock ?? 0}
+                  placeholder="Stock"
+                />
+                <input
+                  name={`v_sku_${i}`}
+                  class="input"
+                  value={(v as any).sku ?? ""}
+                  placeholder="SKU"
+                />
+                <input
+                  name={`v_extra_${i}`}
+                  class="input"
+                  type="number"
+                  min="0"
+                  value={(v as any).precioExtra ?? 0}
+                  placeholder="+$"
+                />
+                <input
+                  type="hidden"
+                  name={`v_id_${i}`}
+                  value={(v as any).id ?? ""}
+                />
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm remove-variante"
+                  style="flex-shrink:0;"
+                >
+                  ✕
+                </button>
+              </div>
+            ))
+          }
         </div>
-        <input type="hidden" name="variantesCount" id="variantes-count" value={producto?.variantes?.length ?? 1} />
-        <p style="font-size:10px; color:#333; margin-top:8px; display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px;">
-          <span>Color</span><span>Hex</span><span>Talle</span><span>Stock</span><span>SKU</span><span>+Precio</span><span></span>
+        <input
+          type="hidden"
+          name="variantesCount"
+          id="variantes-count"
+          value={producto?.variantes?.length ?? 1}
+        />
+        <p
+          style="font-size:10px; color:#333; margin-top:8px; display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px;"
+        >
+          <span>Color</span><span>Hex</span><span>Talle</span><span>Stock</span
+          ><span>SKU</span><span>+Precio</span><span></span>
         </p>
       </div>
-
     </div>
 
     <!-- Sidebar -->
     <div style="display:flex; flex-direction:column; gap:16px;">
-
       <div class="card">
-        <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;">Publicar</h3>
+        <h3
+          style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;"
+        >
+          Publicar
+        </h3>
         <div style="display:flex; gap:16px; margin-bottom:12px;">
-          <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
-            <input type="checkbox" name="activo" value="true" checked={producto?.activo ?? true} />
+          <label
+            style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;"
+          >
+            <input
+              type="checkbox"
+              name="activo"
+              value="true"
+              checked={producto?.activo ?? true}
+            />
             Activo
           </label>
-          <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;">
-            <input type="checkbox" name="destacado" value="true" checked={producto?.destacado ?? false} />
+          <label
+            style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;"
+          >
+            <input
+              type="checkbox"
+              name="destacado"
+              value="true"
+              checked={producto?.destacado ?? false}
+            />
             Destacado
           </label>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;">
-          {esNuevo ? 'Crear producto' : 'Guardar cambios'}
+          {esNuevo ? "Crear producto" : "Guardar cambios"}
         </button>
-        {!esNuevo && (
-          <a href={`/productos/${producto?.slug}`} target="_blank"
-             class="btn btn-ghost btn-sm" style="width:100%; margin-top:8px; display:block; text-align:center;">
-            Ver en tienda →
-          </a>
-        )}
+        {
+          !esNuevo && (
+            <a
+              href={`/productos/${producto?.slug}`}
+              target="_blank"
+              class="btn btn-ghost btn-sm"
+              style="width:100%; margin-top:8px; display:block; text-align:center;"
+            >
+              Ver en tienda →
+            </a>
+          )
+        }
       </div>
 
       <div class="card">
-        <h3 style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;">Detalles</h3>
+        <h3
+          style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;"
+        >
+          Detalles
+        </h3>
         <div style="display:flex; flex-direction:column; gap:10px;">
           <div>
-            <label style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Categoría</label>
+            <label
+              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
+              >Categoría</label
+            >
             <select name="categoriaId" class="input">
               <option value="">Sin categoría</option>
-              {cats.map(cat => (
-                <option value={cat.id} selected={producto?.categoriaId === cat.id}>{cat.nombre}</option>
-              ))}
+              {
+                cats.map((cat) => (
+                  <option
+                    value={cat.id}
+                    selected={producto?.categoriaId === cat.id}
+                  >
+                    {cat.nombre}
+                  </option>
+                ))
+              }
             </select>
           </div>
           <div>
-            <label style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Precio *</label>
-            <input name="precio" type="number" min="0" step="0.01" class="input" required value={producto?.precio ?? ''} placeholder="12500" />
+            <label
+              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
+              >Precio *</label
+            >
+            <input
+              name="precio"
+              type="number"
+              min="0"
+              step="0.01"
+              class="input"
+              required
+              value={producto?.precio ?? ""}
+              placeholder="12500"
+            />
           </div>
           <div>
-            <label style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Precio original (tachado)</label>
-            <input name="precioOriginal" type="number" min="0" step="0.01" class="input" value={producto?.precioOriginal ?? ''} placeholder="15000" />
+            <label
+              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
+              >Precio original (tachado)</label
+            >
+            <input
+              name="precioOriginal"
+              type="number"
+              min="0"
+              step="0.01"
+              class="input"
+              value={producto?.precioOriginal ?? ""}
+              placeholder="15000"
+            />
           </div>
           <div>
-            <label style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Género</label>
+            <label
+              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
+              >Género</label
+            >
             <select name="genero" class="input">
               <option value="">Sin especificar</option>
-              <option value="mujer" selected={producto?.genero === 'mujer'}>Mujer</option>
-              <option value="hombre" selected={producto?.genero === 'hombre'}>Hombre</option>
-              <option value="unisex" selected={producto?.genero === 'unisex'}>Unisex</option>
+              <option value="mujer" selected={producto?.genero === "mujer"}
+                >Mujer</option
+              >
+              <option value="hombre" selected={producto?.genero === "hombre"}
+                >Hombre</option
+              >
+              <option value="unisex" selected={producto?.genero === "unisex"}
+                >Unisex</option
+              >
             </select>
           </div>
           <div>
-            <label style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Material</label>
-            <input name="material" type="text" class="input" value={producto?.material ?? ''} placeholder="Algodón 100%" />
+            <label
+              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
+              >Material</label
+            >
+            <input
+              name="material"
+              type="text"
+              class="input"
+              value={producto?.material ?? ""}
+              placeholder="Algodón 100%"
+            />
           </div>
           <div>
-            <label style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Peso (kg)</label>
-            <input name="peso" type="number" min="0" step="0.001" class="input" value={producto?.peso ?? ''} placeholder="0.250" />
+            <label
+              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
+              >Peso (kg)</label
+            >
+            <input
+              name="peso"
+              type="number"
+              min="0"
+              step="0.001"
+              class="input"
+              value={producto?.peso ?? ""}
+              placeholder="0.250"
+            />
           </div>
         </div>
       </div>
-
     </div>
   </form>
 </AdminLayout>
 
 <script>
-  let count = parseInt(document.getElementById('variantes-count').value);
+  const countEl = document.getElementById("variantes-count");
+  let count = countEl instanceof HTMLInputElement ? parseInt(countEl.value, 10) : 0;
+  if (Number.isNaN(count)) count = 0;
 
-  document.getElementById('add-variante')?.addEventListener('click', () => {
-    const container = document.getElementById('variantes-container');
-    const row = document.createElement('div');
-    row.className = 'variante-row';
-    row.style.cssText = 'display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px; margin-bottom:8px; align-items:center;';
+  document.getElementById("add-variante")?.addEventListener("click", () => {
+    const container = document.getElementById("variantes-container");
+    if (!container) return;
+    const row = document.createElement("div");
+    row.className = "variante-row";
+    row.style.cssText =
+      "display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px; margin-bottom:8px; align-items:center;";
     row.innerHTML = `
       <input name="v_color_${count}" class="input" placeholder="Color" style="background:transparent;border:1px solid #222;color:#F5F2ED;padding:8px 12px;" />
       <input name="v_hex_${count}" class="input" placeholder="#000000" style="background:transparent;border:1px solid #222;color:#F5F2ED;padding:8px 12px;" />
@@ -200,12 +427,14 @@ const success = Astro.url.searchParams.get('success');
     `;
     container.appendChild(row);
     count++;
-    document.getElementById('variantes-count').value = count;
+    const countInput = document.getElementById("variantes-count");
+    if (countInput instanceof HTMLInputElement) countInput.value = String(count);
   });
 
-  document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('remove-variante')) {
-      e.target.closest('.variante-row')?.remove();
+  document.addEventListener("click", (e) => {
+    const target = e.target instanceof HTMLElement ? e.target : null;
+    if (target?.classList.contains("remove-variante")) {
+      target.closest(".variante-row")?.remove();
     }
   });
 </script>

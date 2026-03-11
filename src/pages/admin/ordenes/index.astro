@@ -1,7 +1,7 @@
 ---
-import AdminLayout from '../../components/admin/AdminLayout.astro';
-import { db } from '../../lib/db';
-import { ordenes } from '../../lib/db/schema';
+import AdminLayout from '../../../components/admin/AdminLayout.astro';
+import { db } from '../../../lib/db';
+import { ordenes } from '../../../lib/db/schema';
 import { eq, desc, ilike, and, or } from 'drizzle-orm';
 
 const params = Astro.url.searchParams;
