@@ -11,8 +11,8 @@
  * Body JSON: { path: string }  — path relativo dentro del bucket
  */
 import type { APIRoute } from 'astro';
-import { subirImagen, eliminarImagen } from '../../../lib/supabase';
-import { getAdminFromCookies } from '../../../lib/auth';
+import { subirImagen, eliminarImagen } from '../../../../lib/supabase';
+import { getAdminFromCookies } from '../../../../lib/auth';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const admin = await getAdminFromCookies(cookies);
@@ -36,7 +36,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const resultado = await subirImagen(file, { carpeta, productoSlug });
     return new Response(JSON.stringify({
-      url:  resultado.url,
+      url: resultado.url,
       path: resultado.path,
       size: resultado.size,
       tipo: resultado.tipo,

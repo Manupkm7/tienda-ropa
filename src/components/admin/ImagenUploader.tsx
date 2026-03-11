@@ -280,51 +280,6 @@ export default function ImagenUploader({ value = [], onChange, hiddenInputId, pr
         </div>
       )}
 
-      {/* URLs manuales (fallback) */}
-      <details style={{ marginTop: 4 }}>
-        <summary style={{ fontSize: 10, color: '#333', cursor: 'pointer', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-          Ingresar URL manual
-        </summary>
-        <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-          <input
-            type="url"
-            placeholder="https://..."
-            id="manual-url-input"
-            style={{
-              flex: 1, background: 'transparent', border: '1px solid #222',
-              color: '#F5F2ED', padding: '7px 10px', fontSize: 12, outline: 'none',
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                const val = (e.target as HTMLInputElement).value.trim();
-                if (val && !value.includes(val)) {
-                  notifyChange([...value, val]);
-                  (e.target as HTMLInputElement).value = '';
-                }
-              }
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              const input = document.getElementById('manual-url-input') as HTMLInputElement;
-              const val = input?.value.trim();
-              if (val && !value.includes(val)) {
-                notifyChange([...value, val]);
-                input.value = '';
-              }
-            }}
-            style={{
-              background: '#1a1a1a', border: '1px solid #333', color: '#aaa',
-              padding: '7px 12px', fontSize: 11, cursor: 'pointer',
-            }}
-          >
-            Agregar
-          </button>
-        </div>
-      </details>
-
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );

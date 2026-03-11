@@ -1,12 +1,12 @@
 ---
-import AdminLayout from '../../../components/admin/AdminLayout.astro';
-import { db } from '../../../lib/db';
-import { ordenes } from '../../../lib/db/schema';
-import { eq, desc, ilike, and, or } from 'drizzle-orm';
+import AdminLayout from "../../../components/admin/AdminLayout.astro";
+import { db } from "../../../lib/db";
+import { ordenes } from "../../../lib/db/schema";
+import { eq, desc, ilike, and, or } from "drizzle-orm";
 
 const params = Astro.url.searchParams;
-const estadoFiltro = params.get('estado') ?? '';
-const pagina = parseInt(params.get('pagina') ?? '1');
+const estadoFiltro = params.get("estado") ?? "";
+const pagina = parseInt(params.get("pagina") ?? "1");
 const porPagina = 20;
 
 const conds: any[] = [];
@@ -21,79 +21,148 @@ const todas = await db.query.ordenes.findMany({
 });
 
 const fmt = (n: number) =>
-  new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+  new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(n);
 
 const fmtFecha = (d: Date) =>
-  new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }).format(d);
+  new Intl.DateTimeFormat("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(d);
 
-const ESTADOS = ['', 'pendiente', 'pagado', 'procesando', 'empaquetado', 'enviado', 'entregado', 'cancelado'];
+const ESTADOS = [
+  "",
+  "pendiente",
+  "pagado",
+  "procesando",
+  "empaquetado",
+  "enviado",
+  "entregado",
+  "cancelado",
+];
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "activo":
+      return "#047857";
+    case "pagado":
+      return "#047857";
+    case "entregado":
+      return "#047857";
+    case "visible":
+      return "#047857";
+    case "pendiente":
+      return "#b45309";
+    case "procesando":
+      return "#b45309";
+    case "cancelado":
+      return "#FF0000";
+    case "inactivo":
+      return "#FF0000";
+    case "oculto":
+      return "#FF0000";
+    default:
+      return "#7e22ce";
+  }
+};
 ---
 
 <AdminLayout title="Órdenes">
-
   <!-- Filtros estado -->
   <div style="display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap;">
-    {ESTADOS.map(e => (
-      <a
-        href={`/admin/ordenes${e ? `?estado=${e}` : ''}`}
-        class="btn btn-sm btn-ghost"
-        style={estadoFiltro === e ? 'border-color:#F5F2ED; color:#F5F2ED;' : ''}
-      >
-        {e || 'Todas'}
-      </a>
-    ))}
+    {
+      ESTADOS.map((e) => (
+        <a
+          href={`/admin/ordenes${e ? `?estado=${e}` : ""}`}
+          class={` p-2 rounded capitalize ${estadoFiltro === e ? "bg-[#ff0000] text-white" : "text-ash hover:bg-[#ff0000]"}`}
+        >
+          {e || "Todas"}
+        </a>
+      ))
+    }
   </div>
 
-  <div class="card">
-    <table>
+  <div class="rounded border border-gray-500 bg-[#050505]">
+    <table class="w-full">
       <thead>
-        <tr>
-          <th>Nº</th>
-          <th>Cliente</th>
-          <th>Items</th>
-          <th>Envío</th>
-          <th>Estado</th>
-          <th>Total</th>
-          <th>Fecha</th>
-          <th></th>
+        <tr class="border-b">
+          <th class="text-left text-xs font-medium px-4 py-3">Nº</th>
+          <th class="text-left text-xs font-medium px-4 py-3">Cliente</th>
+          <th class="text-left text-xs font-medium px-4 py-3">Items</th>
+          <th class="text-left text-xs font-medium px-4 py-3">Envío</th>
+          <th class="text-left text-xs font-medium px-4 py-3">Estado</th>
+          <th class="text-left text-xs font-medium px-4 py-3">Total</th>
+          <th class="text-left text-xs font-medium px-4 py-3">Fecha</th>
+          <th class="text-left text-xs font-medium px-4 py-3"></th>
         </tr>
       </thead>
       <tbody>
-        {todas.length === 0 && (
-          <tr><td colspan="8" style="text-align:center; color:#333; padding:32px;">Sin órdenes</td></tr>
-        )}
-        {todas.map(orden => (
-          <tr>
-            <td style="font-family:monospace; color:#F5F2ED; white-space:nowrap;">
-              #{String(orden.numero).padStart(4, '0')}
-            </td>
-            <td>
-              <div>{orden.cliente ? `${orden.cliente.nombre} ${orden.cliente.apellido}` : '—'}</div>
-              <div style="font-size:11px; color:#333;">{orden.cliente?.email}</div>
-            </td>
-            <td style="font-size:11px;">{(orden.items ?? []).length} item(s)</td>
-            <td style="font-size:11px; color:#555;">
-              {orden.datosEnvio?.metodo === 'retiro'
-                ? 'Retiro'
-                : orden.datosEnvio?.metodo
-                  ? orden.datosEnvio.metodo.charAt(0).toUpperCase() + orden.datosEnvio.metodo.slice(1)
-                  : '—'
-              }
-            </td>
-            <td>
-              <span class={`badge badge-${orden.estado}`}>{orden.estado}</span>
-            </td>
-            <td style="font-family:monospace; color:#F5F2ED; white-space:nowrap;">
-              {fmt(parseFloat(orden.total))}
-            </td>
-            <td style="font-size:11px; white-space:nowrap;">{fmtFecha(orden.creadoEn)}</td>
-            <td>
-              <a href={`/admin/ordenes/${orden.id}`} class="btn btn-ghost btn-sm">Ver →</a>
-            </td>
-          </tr>
-        ))}
+        {
+          todas.length === 0 && (
+            <tr class="border-b border-gray-500 transition-colors">
+              <td
+                colspan="8"
+                style="text-align:center; color:#333; padding:32px;"
+              >
+                Sin órdenes
+              </td>
+            </tr>
+          )
+        }
+        {
+          todas.map((orden) => (
+            <tr class="border-b border-gray-500 transition-colors">
+              <td class="px-4 py-4">
+                #{String(orden.numero).padStart(4, "0")}
+              </td>
+              <td class="px-4 py-4">
+                <div>
+                  {orden.cliente
+                    ? `${orden.cliente.nombre} ${orden.cliente.apellido}`
+                    : "—"}
+                </div>
+                <div style="font-size:11px; color:#333;">
+                  {orden.cliente?.email}
+                </div>
+              </td>
+              <td class="px-4 py-4">{(orden.items ?? []).length} item(s)</td>
+              <td class="px-4 py-4">
+                {orden.datosEnvio?.metodo === "retiro"
+                  ? "Retiro"
+                  : orden.datosEnvio?.metodo
+                    ? orden.datosEnvio.metodo.charAt(0).toUpperCase() +
+                      orden.datosEnvio.metodo.slice(1)
+                    : "—"}
+              </td>
+              <td class="px-4 py-4">
+                <span
+                  class="text-xs px-2 py-1 rounded"
+                  style={{
+                    backgroundColor: `${getStatusColor(orden.estado)}20`,
+                    color: getStatusColor(orden.estado),
+                  }}
+                >
+                  {orden.estado}
+                </span>
+              </td>
+              <td class="px-4 py-4">{fmt(parseFloat(orden.total))}</td>
+              <td class="px-4 py-4">{fmtFecha(orden.creadoEn)}</td>
+              <td class="px-4 py-4">
+                <a
+                  href={`/admin/ordenes/${orden.id}`}
+                  class="text-xs flex items-center gap-1 transition-colors hover:opacity-70 text-[#ff0000] hover:text-rust"
+                >
+                  Ver →
+                </a>
+              </td>
+            </tr>
+          ))
+        }
       </tbody>
     </table>
   </div>
-
 </AdminLayout>

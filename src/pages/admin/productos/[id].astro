@@ -1,4 +1,5 @@
 ---
+import { ArrowLeft } from "lucide-react";
 import AdminLayout from "../../../components/admin/AdminLayout.astro";
 import ImagenUploader from "../../../components/admin/ImagenUploader";
 import { db } from "../../../lib/db";
@@ -28,8 +29,8 @@ const success = Astro.url.searchParams.get("success");
 <AdminLayout title={esNuevo ? "Nuevo producto" : `Editar: ${producto?.nombre}`}>
   <a
     href="/admin/productos"
-    style="font-size:12px; color:#555; display:inline-block; margin-bottom:24px;"
-    >← Volver</a
+    class="text-sm mb-6 flex items-center gap-2 transition-colors hover:opacity-70 text-[#ff0000] hover:text-rust"
+    ><ArrowLeft /> Volver</a
   >
 
   {
@@ -43,216 +44,194 @@ const success = Astro.url.searchParams.get("success");
     )
   }
 
-  <form
-    method="POST"
-    action={`/api/admin/productos/${esNuevo ? "crear" : producto?.id}`}
-    style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;"
-  >
-    <!-- Principal -->
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      <div class="card">
-        <h3
-          style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;"
-        >
-          Información básica
-        </h3>
-        <div style="display:grid; gap:14px;">
-          <div>
-            <label
-              style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;"
-              >Nombre *</label
-            >
-            <input
-              name="nombre"
-              type="text"
-              class="input"
-              required
-              value={producto?.nombre ?? ""}
-              placeholder="Remera Oversized"
-            />
-          </div>
-          <div>
-            <label
-              style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;"
-              >Slug *</label
-            >
-            <input
-              name="slug"
-              type="text"
-              class="input"
-              required
-              value={producto?.slug ?? ""}
-              placeholder="remera-oversized"
-            />
-            <p style="font-size:10px; color:#333; margin-top:4px;">
-              URL del producto. Usar solo letras, números y guiones.
-            </p>
-          </div>
-          <div>
-            <label
-              style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;"
-              >Descripción corta</label
-            >
-            <input
-              name="descripcionCorta"
-              type="text"
-              class="input"
-              value={producto?.descripcionCorta ?? ""}
-              placeholder="Tagline del producto"
-            />
-          </div>
-          <div>
-            <label
-              style="display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-bottom:6px;"
-              >Descripción completa</label
-            >
-            <textarea
-              name="descripcion"
-              class="input"
-              rows="4"
-              style="resize:vertical;">{producto?.descripcion ?? ""}</textarea
-            >
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3
-          style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;"
-        >
-          Imágenes
-        </h3>
-        <!-- Input oculto que recibe las URLs del uploader -->
-        <input
-          type="hidden"
-          name="imagenesJson"
-          id="imagenes-json-input"
-          value={JSON.stringify(producto?.imagenes ?? [])}
-        />
-        <!-- Uploader React island -->
-        <ImagenUploader
-          client:load
-          value={producto?.imagenes ?? []}
-          productoSlug={producto?.slug}
-          hiddenInputId="imagenes-json-input"
-        />
-        <p style="font-size:10px; color:#333; margin-top:8px;">
-          La primera imagen es la principal. Arrastrá para reordenar.
-        </p>
-      </div>
-
-      <!-- Variantes -->
-      <div class="card">
-        <div
-          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;"
-        >
-          <h3
-            style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444;"
-          >
-            Variantes (color + talle + stock)
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <form
+      method="POST"
+      action={`/api/admin/productos/${esNuevo ? "crear" : producto?.id}`}
+      class="col-span-2"
+    >
+      <!-- Principal -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
+          <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">
+            Información básica
           </h3>
-          <button type="button" id="add-variante" class="btn btn-ghost btn-sm"
-            >+ Variante</button
-          >
-        </div>
-        <div id="variantes-container">
-          {
-            (
-              producto?.variantes ?? [
-                {
-                  color: "",
-                  codigoHex: "",
-                  talla: "",
-                  stock: 0,
-                  sku: "",
-                  precioExtra: 0,
-                },
-              ]
-            ).map((v, i) => (
-              <div
-                class="variante-row"
-                style="display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px; margin-bottom:8px; align-items:center;"
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs mb-2 text-[#666666]">Nombre *</label>
+              <input
+                name="nombre"
+                type="text"
+                class="input-field"
+                required
+                value={producto?.nombre ?? ""}
+                placeholder="Remera Oversized"
+              />
+            </div>
+            <div>
+              <label class="block text-xs mb-2 text-[#666666]">Slug *</label>
+              <input
+                name="slug"
+                type="text"
+                class="input-field"
+                required
+                value={producto?.slug ?? ""}
+                placeholder="remera-oversized"
+              />
+              <p style="text-xs mt-2 text-[#0a0a0a]">
+                URL del producto. Usar solo letras, números y guiones.
+              </p>
+            </div>
+            <div>
+              <label class="block text-xs mb-2 text-[#666666]"
+                >Descripción corta</label
               >
-                <input
-                  name={`v_color_${i}`}
-                  class="input"
-                  value={(v as any).color ?? ""}
-                  placeholder="Color"
-                />
-                <input
-                  name={`v_hex_${i}`}
-                  class="input"
-                  value={(v as any).codigoHex ?? ""}
-                  placeholder="#000000"
-                />
-                <input
-                  name={`v_talla_${i}`}
-                  class="input"
-                  value={(v as any).talla ?? ""}
-                  placeholder="M"
-                  style="text-align:center;"
-                />
-                <input
-                  name={`v_stock_${i}`}
-                  class="input"
-                  type="number"
-                  min="0"
-                  value={(v as any).stock ?? 0}
-                  placeholder="Stock"
-                />
-                <input
-                  name={`v_sku_${i}`}
-                  class="input"
-                  value={(v as any).sku ?? ""}
-                  placeholder="SKU"
-                />
-                <input
-                  name={`v_extra_${i}`}
-                  class="input"
-                  type="number"
-                  min="0"
-                  value={(v as any).precioExtra ?? 0}
-                  placeholder="+$"
-                />
-                <input
-                  type="hidden"
-                  name={`v_id_${i}`}
-                  value={(v as any).id ?? ""}
-                />
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm remove-variante"
-                  style="flex-shrink:0;"
-                >
-                  ✕
-                </button>
-              </div>
-            ))
-          }
+              <input
+                name="descripcionCorta"
+                type="text"
+                class="input-field"
+                value={producto?.descripcionCorta ?? ""}
+                placeholder="Tagline del producto"
+              />
+            </div>
+            <div>
+              <label class="block text-xs mb-2 text-[#666666]"
+                >Descripción completa</label
+              >
+              <textarea
+                name="descripcion"
+                class="input-field"
+                rows="4"
+                style="resize:vertical;">{producto?.descripcion ?? ""}</textarea
+              >
+            </div>
+          </div>
         </div>
-        <input
-          type="hidden"
-          name="variantesCount"
-          id="variantes-count"
-          value={producto?.variantes?.length ?? 1}
-        />
-        <p
-          style="font-size:10px; color:#333; margin-top:8px; display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px;"
-        >
-          <span>Color</span><span>Hex</span><span>Talle</span><span>Stock</span
-          ><span>SKU</span><span>+Precio</span><span></span>
-        </p>
+
+        <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
+          <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">
+            Imágenes
+          </h3>
+          <!-- Input oculto que recibe las URLs del uploader -->
+          <input
+            type="hidden"
+            name="imagenesJson"
+            id="imagenes-json-input"
+            value={JSON.stringify(producto?.imagenes ?? [])}
+          />
+          <!-- Uploader React island -->
+          <ImagenUploader
+            client:load
+            value={producto?.imagenes ?? []}
+            productoSlug={producto?.slug}
+            hiddenInputId="imagenes-json-input"
+          />
+        </div>
+
+        <!-- Variantes -->
+        <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">
+              Variantes (color + talle + stock)
+            </h3>
+            <button
+              type="button"
+              id="add-variante"
+              class="text-[#ff0000] hover:text-rust mb-6">+ Variante</button
+            >
+          </div>
+          <div id="variantes-container">
+            <div class="grid grid-cols-7 gap-3 text-xs mb-4">
+              <span>Color</span>
+              <span>Hex</span>
+              <span>Talle</span>
+              <span>Stock</span>
+              <span>SKU</span>
+              <span>+Precio</span>
+            </div>
+            {
+              (
+                producto?.variantes ?? [
+                  {
+                    color: "",
+                    codigoHex: "",
+                    talla: "",
+                    stock: 0,
+                    sku: "",
+                    precioExtra: 0,
+                  },
+                ]
+              ).map((v, i) => (
+                <div class="grid grid-cols-7 gap-3 items-center py-3 border-t">
+                  <input
+                    name={`v_color_${i}`}
+                    class="input-field"
+                    value={(v as any).color ?? ""}
+                    placeholder="Color"
+                  />
+                  <input
+                    name={`v_hex_${i}`}
+                    class="input-field"
+                    value={(v as any).codigoHex ?? ""}
+                  />
+                  <input
+                    name={`v_talla_${i}`}
+                    class="input-field"
+                    value={(v as any).talla ?? ""}
+                    style="text-align:center;"
+                  />
+                  <input
+                    name={`v_stock_${i}`}
+                    class="input-field"
+                    type="number"
+                    min="0"
+                    value={(v as any).stock ?? 0}
+                    placeholder="Stock"
+                  />
+                  <input
+                    name={`v_sku_${i}`}
+                    class="input-field"
+                    value={(v as any).sku ?? ""}
+                    placeholder="SKU"
+                  />
+                  <input
+                    name={`v_extra_${i}`}
+                    class="input-field"
+                    type="number"
+                    min="0"
+                    value={(v as any).precioExtra ?? 0}
+                    placeholder="+$"
+                  />
+                  <input
+                    type="hidden"
+                    name={`v_id_${i}`}
+                    value={(v as any).id ?? ""}
+                  />
+                  <button
+                    type="button"
+                    class="text-[#ff0000] hover:text-white hover:bg-[#ff0000] transition-colors p-2 border border-[#ff0000]"
+                    style="flex-shrink:0;"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            }
+          </div>
+          <input
+            type="hidden"
+            name="variantesCount"
+            id="variantes-count"
+            value={producto?.variantes?.length ?? 1}
+          />
+        </div>
       </div>
-    </div>
+    </form>
 
     <!-- Sidebar -->
     <div style="display:flex; flex-direction:column; gap:16px;">
-      <div class="card">
-        <h3
-          style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;"
-        >
-          Publicar
-        </h3>
+      <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
+        <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">Publicar</h3>
         <div style="display:flex; gap:16px; margin-bottom:12px;">
           <label
             style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;"
@@ -277,7 +256,7 @@ const success = Astro.url.searchParams.get("success");
             Destacado
           </label>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;">
+        <button type="submit" class="btn-primary bg-[#ff0000]" style="width:100%;">
           {esNuevo ? "Crear producto" : "Guardar cambios"}
         </button>
         {
@@ -294,19 +273,15 @@ const success = Astro.url.searchParams.get("success");
         }
       </div>
 
-      <div class="card">
-        <h3
-          style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#444; margin-bottom:16px;"
-        >
-          Detalles
-        </h3>
+      <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
+        <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">Detalles</h3>
         <div style="display:flex; flex-direction:column; gap:10px;">
           <div>
             <label
               style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
               >Categoría</label
             >
-            <select name="categoriaId" class="input">
+            <select name="categoriaId" class="input-field">
               <option value="">Sin categoría</option>
               {
                 cats.map((cat) => (
@@ -330,7 +305,7 @@ const success = Astro.url.searchParams.get("success");
               type="number"
               min="0"
               step="0.01"
-              class="input"
+              class="input-field"
               required
               value={producto?.precio ?? ""}
               placeholder="12500"
@@ -346,7 +321,7 @@ const success = Astro.url.searchParams.get("success");
               type="number"
               min="0"
               step="0.01"
-              class="input"
+              class="input-field"
               value={producto?.precioOriginal ?? ""}
               placeholder="15000"
             />
@@ -356,7 +331,7 @@ const success = Astro.url.searchParams.get("success");
               style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
               >Género</label
             >
-            <select name="genero" class="input">
+            <select name="genero" class="input-field">
               <option value="">Sin especificar</option>
               <option value="mujer" selected={producto?.genero === "mujer"}
                 >Mujer</option
@@ -377,7 +352,7 @@ const success = Astro.url.searchParams.get("success");
             <input
               name="material"
               type="text"
-              class="input"
+              class="input-field"
               value={producto?.material ?? ""}
               placeholder="Algodón 100%"
             />
@@ -392,7 +367,7 @@ const success = Astro.url.searchParams.get("success");
               type="number"
               min="0"
               step="0.001"
-              class="input"
+              class="input-field"
               value={producto?.peso ?? ""}
               placeholder="0.250"
             />
@@ -400,12 +375,13 @@ const success = Astro.url.searchParams.get("success");
         </div>
       </div>
     </div>
-  </form>
+  </div>
 </AdminLayout>
 
 <script>
   const countEl = document.getElementById("variantes-count");
-  let count = countEl instanceof HTMLInputElement ? parseInt(countEl.value, 10) : 0;
+  let count =
+    countEl instanceof HTMLInputElement ? parseInt(countEl.value, 10) : 0;
   if (Number.isNaN(count)) count = 0;
 
   document.getElementById("add-variante")?.addEventListener("click", () => {
@@ -416,19 +392,20 @@ const success = Astro.url.searchParams.get("success");
     row.style.cssText =
       "display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px; margin-bottom:8px; align-items:center;";
     row.innerHTML = `
-      <input name="v_color_${count}" class="input" placeholder="Color" style="background:transparent;border:1px solid #222;color:#F5F2ED;padding:8px 12px;" />
-      <input name="v_hex_${count}" class="input" placeholder="#000000" style="background:transparent;border:1px solid #222;color:#F5F2ED;padding:8px 12px;" />
-      <input name="v_talla_${count}" class="input" placeholder="M" style="background:transparent;border:1px solid #222;color:#F5F2ED;padding:8px 12px;text-align:center;" />
-      <input name="v_stock_${count}" class="input" type="number" min="0" value="0" style="background:transparent;border:1px solid #222;color:#F5F2ED;padding:8px 12px;" />
-      <input name="v_sku_${count}" class="input" placeholder="SKU" style="background:transparent;border:1px solid #222;color:#F5F2ED;padding:8px 12px;" />
-      <input name="v_extra_${count}" class="input" type="number" min="0" value="0" style="background:transparent;border:1px solid #222;color:#F5F2ED;padding:8px 12px;" />
+      <input name="v_color_${count}" class="input-field" placeholder="Color" />
+      <input name="v_hex_${count}" class="input-field" placeholder="#000000" />
+      <input name="v_talla_${count}" class="input-field" placeholder="M" />
+      <input name="v_stock_${count}" class="input-field" type="number" min="0" value="0" />
+      <input name="v_sku_${count}" class="input-field" placeholder="SKU" />
+      <input name="v_extra_${count}" class="input-field" type="number" min="0" value="0" />
       <input type="hidden" name="v_id_${count}" value="" />
-      <button type="button" class="remove-variante" style="background:rgba(196,82,42,0.15);color:#C4522A;border:1px solid rgba(196,82,42,0.3);padding:6px 10px;font-size:12px;cursor:pointer;">✕</button>
+      <button type="button" class="remove-variante">✕</button>
     `;
     container.appendChild(row);
     count++;
     const countInput = document.getElementById("variantes-count");
-    if (countInput instanceof HTMLInputElement) countInput.value = String(count);
+    if (countInput instanceof HTMLInputElement)
+      countInput.value = String(count);
   });
 
   document.addEventListener("click", (e) => {
