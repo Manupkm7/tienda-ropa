@@ -36,7 +36,7 @@ const success = Astro.url.searchParams.get("success");
   {
     success && (
       <div
-        style="background:rgba(0,160,80,0.1); border:1px solid rgba(0,160,80,0.3); color:#00a050;
+        class="background:rgba(0,160,80,0.1); border:1px solid rgba(0,160,80,0.3); color:#00a050;
                 padding:10px 16px; font-size:12px; margin-bottom:20px;"
       >
         ✓ Producto guardado correctamente
@@ -78,7 +78,7 @@ const success = Astro.url.searchParams.get("success");
                 value={producto?.slug ?? ""}
                 placeholder="remera-oversized"
               />
-              <p style="text-xs mt-2 text-[#0a0a0a]">
+              <p class="text-xs mt-2 text-[#0a0a0a]">
                 URL del producto. Usar solo letras, números y guiones.
               </p>
             </div>
@@ -102,7 +102,7 @@ const success = Astro.url.searchParams.get("success");
                 name="descripcion"
                 class="input-field"
                 rows="4"
-                style="resize:vertical;">{producto?.descripcion ?? ""}</textarea
+                class="resize:vertical;">{producto?.descripcion ?? ""}</textarea
               >
             </div>
           </div>
@@ -178,7 +178,7 @@ const success = Astro.url.searchParams.get("success");
                     name={`v_talla_${i}`}
                     class="input-field"
                     value={(v as any).talla ?? ""}
-                    style="text-align:center;"
+                    class="text-align:center;"
                   />
                   <input
                     name={`v_stock_${i}`}
@@ -210,7 +210,7 @@ const success = Astro.url.searchParams.get("success");
                   <button
                     type="button"
                     class="text-[#ff0000] hover:text-white hover:bg-[#ff0000] transition-colors p-2 border border-[#ff0000]"
-                    style="flex-shrink:0;"
+                    class="flex-shrink:0;"
                   >
                     ✕
                   </button>
@@ -229,13 +229,11 @@ const success = Astro.url.searchParams.get("success");
     </form>
 
     <!-- Sidebar -->
-    <div style="display:flex; flex-direction:column; gap:16px;">
+    <div class="flex flex-col gap-2">
       <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
         <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">Publicar</h3>
-        <div style="display:flex; gap:16px; margin-bottom:12px;">
-          <label
-            style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;"
-          >
+        <div class="flex gap-2 mb-2">
+          <label class="flex items-center gap-1.5 text-[12px] cursor-pointer">
             <input
               type="checkbox"
               name="activo"
@@ -244,9 +242,7 @@ const success = Astro.url.searchParams.get("success");
             />
             Activo
           </label>
-          <label
-            style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;"
-          >
+          <label class="flex items-center gap-1.5 text-[12px] cursor-pointer">
             <input
               type="checkbox"
               name="destacado"
@@ -256,7 +252,11 @@ const success = Astro.url.searchParams.get("success");
             Destacado
           </label>
         </div>
-        <button type="submit" class="btn-primary bg-[#ff0000]" style="width:100%;">
+        <button
+          type="submit"
+          class="btn-primary bg-[#ff0000]"
+          class="width:100%;"
+        >
           {esNuevo ? "Crear producto" : "Guardar cambios"}
         </button>
         {
@@ -265,7 +265,7 @@ const success = Astro.url.searchParams.get("success");
               href={`/productos/${producto?.slug}`}
               target="_blank"
               class="btn btn-ghost btn-sm"
-              style="width:100%; margin-top:8px; display:block; text-align:center;"
+              class="w-full mt-2 block align-center"
             >
               Ver en tienda →
             </a>
@@ -275,10 +275,10 @@ const success = Astro.url.searchParams.get("success");
 
       <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
         <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">Detalles</h3>
-        <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="flex flex-col gap-2.5">
           <div>
             <label
-              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
+              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
               >Categoría</label
             >
             <select name="categoriaId" class="input-field">
@@ -297,7 +297,7 @@ const success = Astro.url.searchParams.get("success");
           </div>
           <div>
             <label
-              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
+              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
               >Precio *</label
             >
             <input
@@ -313,9 +313,10 @@ const success = Astro.url.searchParams.get("success");
           </div>
           <div>
             <label
-              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
-              >Precio original (tachado)</label
+              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
             >
+              Precio original (tachado)
+            </label>
             <input
               name="precioOriginal"
               type="number"
@@ -328,9 +329,10 @@ const success = Astro.url.searchParams.get("success");
           </div>
           <div>
             <label
-              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
-              >Género</label
+              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
             >
+              Género
+            </label>
             <select name="genero" class="input-field">
               <option value="">Sin especificar</option>
               <option value="mujer" selected={producto?.genero === "mujer"}
@@ -346,9 +348,9 @@ const success = Astro.url.searchParams.get("success");
           </div>
           <div>
             <label
-              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
-              >Material</label
-            >
+              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
+              >Material
+            </label>
             <input
               name="material"
               type="text"
@@ -359,9 +361,10 @@ const success = Astro.url.searchParams.get("success");
           </div>
           <div>
             <label
-              style="display:block; font-size:10px; color:#555; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;"
-              >Peso (kg)</label
+              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
             >
+              Peso (kg)
+            </label>
             <input
               name="peso"
               type="number"
@@ -390,7 +393,7 @@ const success = Astro.url.searchParams.get("success");
     const row = document.createElement("div");
     row.className = "variante-row";
     row.style.cssText =
-      "display:grid; grid-template-columns:1fr 80px 60px 80px 80px 80px auto; gap:6px; margin-bottom:8px; align-items:center;";
+      "display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); margin-bottom:8px; align-items:center; gap:12px;";
     row.innerHTML = `
       <input name="v_color_${count}" class="input-field" placeholder="Color" />
       <input name="v_hex_${count}" class="input-field" placeholder="#000000" />
@@ -399,7 +402,7 @@ const success = Astro.url.searchParams.get("success");
       <input name="v_sku_${count}" class="input-field" placeholder="SKU" />
       <input name="v_extra_${count}" class="input-field" type="number" min="0" value="0" />
       <input type="hidden" name="v_id_${count}" value="" />
-      <button type="button" class="remove-variante">✕</button>
+      <button type="button" class="text-[#ff0000] hover:text-white hover:bg-[#ff0000] transition-colors p-2 border border-[#ff0000]">✕</button>
     `;
     container.appendChild(row);
     count++;
