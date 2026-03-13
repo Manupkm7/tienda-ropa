@@ -1,0 +1,301 @@
+---
+import { Pencil, Trash2 } from "lucide-react";
+import AdminLayout from "../../../components/admin/AdminLayout.astro";
+import { db } from "../../../lib/db";
+import { categorias, productos } from "../../../lib/db/schema";
+import { eq, sql } from "drizzle-orm";
+
+const todas = await db
+  .select({
+    id: categorias.id,
+    nombre: categorias.nombre,
+    slug: categorias.slug,
+    activa: categorias.activa,
+    orden: categorias.orden,
+    productosCount: sql<number>`COUNT(${productos.id})`,
+  })
+  .from(categorias)
+  .leftJoin(productos, eq(productos.categoriaId, categorias.id))
+  .groupBy(
+    categorias.id,
+    categorias.nombre,
+    categorias.slug,
+    categorias.activa,
+    categorias.orden
+  )
+  .orderBy(categorias.orden);
+---
+
+<AdminLayout title="Categorías">
+  <div class="flex items-center justify-between mb-6">
+    <p class="text-sm text-[#666666]">
+      {todas.length} categorías
+    </p>
+  </div>
+
+  <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a] relative">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b">
+          <th class="text-left text-xs font-medium px-4 py-3">Nombre</th>
+          <th class="text-left text-xs font-medium px-4 py-3">Slug</th>
+          <th class="text-left text-xs font-medium px-4 py-3">
+            Cant. productos
+          </th>
+          <th class="text-left text-xs font-medium px-4 py-3">Estado</th>
+          <th class="text-left text-xs font-medium px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          todas.length === 0 && (
+            <tr>
+              <td
+                colspan="5"
+                class="px-4 py-8 text-center text-sm text-[#444444]"
+              >
+                No hay categorías creadas.
+              </td>
+            </tr>
+          )
+        }
+        {
+          todas.map((cat) => (
+            <tr class="border-b border-gray-500 transition-colors">
+              <td class="px-4 py-4">
+                <div class="flex flex-col gap-0.5">
+                  <span class="text-base text-white">{cat.nombre}</span>
+                  <span class="text-xs text-[#666666]">
+                    Orden: {cat.orden ?? 0}
+                  </span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-sm text-[#ff0000]">
+                {cat.slug}
+              </td>
+              <td class="px-4 py-4 text-sm">
+                {cat.productosCount}
+              </td>
+              <td class="px-4 py-4">
+                {
+                  cat.activa ? (
+                    <span class="text-xs px-2 py-1 rounded bg-emerald-500/20 text-emerald-400">
+                      Activa
+                    </span>
+                  ) : (
+                    <span class="text-xs px-2 py-1 rounded bg-[#ff0000]/20 text-[#ff0000]">
+                      Inactiva
+                    </span>
+                  )
+                }
+              </td>
+              <td class="px-4 py-4">
+                <div class="flex items-center gap-2 justify-end">
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-sm flex items-center gap-1"
+                    data-open-edit-modal={cat.id}
+                  >
+                    <Pencil size={14} />
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm flex items-center gap-1"
+                    data-open-delete-modal={cat.id}
+                  >
+                    <Trash2 size={14} />
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  {
+    todas.map((cat) => (
+      <>
+        <div
+          class="hidden fixed inset-0 z-30 bg-black/40 items-center justify-center"
+          data-edit-modal={cat.id}
+        >
+          <div
+            class="bg-[#050505] border border-[#1a1a1a] rounded-lg p-6 w-full max-w-md"
+          >
+            <h2 class="text-lg mb-4">Editar categoría</h2>
+            <form method="POST" action={`/api/admin/categorias/${cat.id}`}>
+              <div class="space-y-3 mb-4">
+                <div>
+                  <label class="block text-xs mb-1 text-[#666666]">
+                    Nombre
+                  </label>
+                  <input
+                    name="nombre"
+                    type="text"
+                    class="input-field"
+                    value={cat.nombre}
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs mb-1 text-[#666666]">
+                    Slug
+                  </label>
+                  <input
+                    name="slug"
+                    type="text"
+                    class="input-field"
+                    value={cat.slug}
+                    required
+                  />
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                  <input
+                    id={`cat-activa-${cat.id}`}
+                    type="checkbox"
+                    name="activa"
+                    value="true"
+                    checked={cat.activa ?? true}
+                  />
+                  <label
+                    for={`cat-activa-${cat.id}`}
+                    class="text-xs text-[#aaaaaa]"
+                  >
+                    Categoría activa
+                  </label>
+                </div>
+                <div>
+                  <label class="block text-xs mb-1 text-[#666666]">
+                    Orden
+                  </label>
+                  <input
+                    name="orden"
+                    type="number"
+                    class="input-field"
+                    value={cat.orden ?? 0}
+                  />
+                </div>
+              </div>
+              <div class="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  data-close-modal
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm bg-[#ff0000]"
+                >
+                  Guardar cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div
+          class="hidden fixed inset-0 z-30 bg-black/40 items-center justify-center"
+          data-delete-modal={cat.id}
+        >
+          <div
+            class="bg-[#050505] border border-[#1a1a1a] rounded-lg p-6 w-full max-w-md"
+          >
+            <h2 class="text-lg mb-2 text-[#ff0000]">Eliminar categoría</h2>
+            <p class="text-sm text-[#cccccc] mb-4">
+              ¿Estás seguro de que querés eliminar{" "}
+              <span class="font-semibold">{cat.nombre}</span>? Esta acción no
+              se puede deshacer.
+            </p>
+            <form
+              method="POST"
+              action={`/api/admin/categorias/${cat.id}/eliminar`}
+            >
+              <div class="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  data-close-modal
+                >
+                  Cancelar
+                </button>
+                <button type="submit" class="btn btn-danger btn-sm">
+                  Confirmar eliminación
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </>
+    ))
+  }
+</AdminLayout>
+
+<script>
+  const openEditButtons = document.querySelectorAll("[data-open-edit-modal]");
+  const openDeleteButtons = document.querySelectorAll(
+    "[data-open-delete-modal]"
+  );
+
+  const hideAllModals = () => {
+    document
+      .querySelectorAll("[data-edit-modal], [data-delete-modal]")
+      .forEach((el) => {
+        if (el instanceof HTMLElement) {
+          el.classList.add("hidden");
+          el.classList.remove("flex");
+        }
+      });
+  };
+
+  openEditButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-open-edit-modal");
+      if (!id) return;
+      hideAllModals();
+      const modal = document.querySelector(`[data-edit-modal="${id}"]`);
+      if (modal instanceof HTMLElement) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    });
+  });
+
+  openDeleteButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-open-delete-modal");
+      if (!id) return;
+      hideAllModals();
+      const modal = document.querySelector(`[data-delete-modal="${id}"]`);
+      if (modal instanceof HTMLElement) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    if (target.hasAttribute("data-close-modal")) {
+      hideAllModals();
+      return;
+    }
+
+    const editModal = target.closest("[data-edit-modal]");
+    const deleteModal = target.closest("[data-delete-modal]");
+    if (
+      (editModal || deleteModal) &&
+      (target === editModal || target === deleteModal)
+    ) {
+      hideAllModals();
+    }
+  });
+</script>
+

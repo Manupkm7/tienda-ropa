@@ -35,10 +35,7 @@ const success = Astro.url.searchParams.get("success");
 
   {
     success && (
-      <div
-        class="background:rgba(0,160,80,0.1); border:1px solid rgba(0,160,80,0.3); color:#00a050;
-                padding:10px 16px; font-size:12px; margin-bottom:20px;"
-      >
+      <div class="bg-emerald-500/50 border-emerald-800 border-2 text-[#00a050] p-2.5 text-sm mb-4">
         ✓ Producto guardado correctamente
       </div>
     )
@@ -53,7 +50,7 @@ const success = Astro.url.searchParams.get("success");
       <!-- Principal -->
       <div class="lg:col-span-2 space-y-6">
         <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
-          <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">
+          <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">
             Información básica
           </h3>
           <div class="space-y-4">
@@ -109,9 +106,7 @@ const success = Astro.url.searchParams.get("success");
         </div>
 
         <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
-          <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">
-            Imágenes
-          </h3>
+          <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">Imágenes</h3>
           <!-- Input oculto que recibe las URLs del uploader -->
           <input
             type="hidden"
@@ -131,7 +126,7 @@ const success = Astro.url.searchParams.get("success");
         <!-- Variantes -->
         <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
           <div class="flex justify-between items-center mb-2">
-            <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">
+            <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">
               Variantes (color + talle + stock)
             </h3>
             <button
@@ -231,7 +226,7 @@ const success = Astro.url.searchParams.get("success");
     <!-- Sidebar -->
     <div class="flex flex-col gap-2">
       <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
-        <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">Publicar</h3>
+        <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">Publicar</h3>
         <div class="flex gap-2 mb-2">
           <label class="flex items-center gap-1.5 text-[12px] cursor-pointer">
             <input
@@ -252,29 +247,30 @@ const success = Astro.url.searchParams.get("success");
             Destacado
           </label>
         </div>
-        <button
-          type="submit"
-          class="btn-primary bg-[#ff0000]"
-          class="width:100%;"
-        >
-          {esNuevo ? "Crear producto" : "Guardar cambios"}
-        </button>
-        {
-          !esNuevo && (
-            <a
-              href={`/productos/${producto?.slug}`}
-              target="_blank"
-              class="btn btn-ghost btn-sm"
-              class="w-full mt-2 block align-center"
-            >
-              Ver en tienda →
-            </a>
-          )
-        }
+        <div class="flex gap-2 items-center">
+          <button
+            type="submit"
+            class="btn-primary bg-[#ff0000] w-full"
+            
+          >
+            {esNuevo ? "Crear producto" : "Guardar cambios"}
+          </button>
+          {
+            !esNuevo && (
+              <a
+                href={`/productos/${producto?.slug}`}
+                target="_blank"
+                class="w-full mt-2 hover:text-rust"
+              >
+                Ver en tienda →
+              </a>
+            )
+          }
+        </div>
       </div>
 
       <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
-        <h3 class="text-xs tracking-[0.2em] mb-6 text-[##666666]">Detalles</h3>
+        <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">Detalles</h3>
         <div class="flex flex-col gap-2.5">
           <div>
             <label

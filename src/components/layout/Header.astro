@@ -2,13 +2,6 @@
 import CarritoIcon from "../carrito/CarritoIcon";
 import { getClienteFromCookies } from "../../lib/userAuth";
 
-const nav = [
-  { href: "/productos", label: "Catálogo" },
-  { href: "/productos?categoria=remeras", label: "Remeras" },
-  { href: "/productos?categoria=pantalones", label: "Pantalones" },
-  { href: "/productos?categoria=camperas", label: "Camperas" },
-];
-
 const currentPath = Astro.url.pathname;
 const cliente = await getClienteFromCookies(Astro.cookies);
 ---
@@ -24,23 +17,6 @@ const cliente = await getClienteFromCookies(Astro.cookies);
             T<span class="text-[#ff0000]">I</span>ENDA
           </h1>
         </a>
-        <!-- Nav desktop -->
-        <nav class="hidden md:flex items-center gap-8">
-          {
-            nav.map(({ href, label }) => (
-              <a
-                href={href}
-                class={`text-xs tracking-widest uppercase transition-colors duration-150 ${
-                  currentPath.startsWith(href.split("?")[0])
-                    ? "text-[#ff0000]"
-                    : "text-ash hover:text-[#ff0000]"
-                }`}
-              >
-                {label}
-              </a>
-            ))
-          }
-        </nav>
       </div>
 
       <!-- Acciones -->
@@ -97,45 +73,8 @@ const cliente = await getClienteFromCookies(Astro.cookies);
 
         <!-- Carrito icon — React island para contador reactivo -->
         <CarritoIcon client:load />
-
-        <!-- Menú mobile -->
-        <button
-          id="menu-toggle"
-          class="md:hidden text-ash hover:text-ink transition-colors"
-          aria-label="Menú"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-          >
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
       </div>
     </div>
-
-    <!-- Nav mobile -->
-    <nav
-      id="mobile-menu"
-      class="hidden md:hidden pb-4 space-y-3 border-t border-dust pt-4"
-    >
-      {
-        nav.map(({ href, label }) => (
-          <a
-            href={href}
-            class="block text-xs tracking-widest uppercase text-ash hover:text-ink transition-colors"
-          >
-            {label}
-          </a>
-        ))
-      }
-    </nav>
   </div>
 </header>
 
