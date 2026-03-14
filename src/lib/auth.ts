@@ -55,13 +55,13 @@ export function setSessionCookie(cookies: APIContext['cookies'], sessionId: stri
     httpOnly: true,
     secure: import.meta.env.PROD,
     sameSite: 'lax',
-    path: '/admin',
+    path: '/', // ✅ antes era '/admin'
     maxAge: SESSION_DURATION_DAYS * 24 * 60 * 60,
   });
 }
 
 export function clearSessionCookie(cookies: APIContext['cookies']) {
-  cookies.delete(SESSION_COOKIE, { path: '/admin' });
+  cookies.delete(SESSION_COOKIE, { path: '/' }); // ✅ también acá
 }
 
 export const SESSION_COOKIE_NAME = SESSION_COOKIE;
