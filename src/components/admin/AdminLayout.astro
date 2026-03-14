@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 
 const admin = await getAdminFromCookies(Astro.cookies);
-if (!admin) return Astro.redirect("/admin/login");
 
 interface Props {
   title: string;
