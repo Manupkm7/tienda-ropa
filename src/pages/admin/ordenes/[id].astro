@@ -62,7 +62,11 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
 ---
 
 <AdminLayout title={`Orden #${String(orden.numero).padStart(4, "0")}`}>
-  <div class="flex justify-between items-center mb-6">
+  <div
+    class="flex justify-between items-center mb-6"
+    id="orden-header"
+    data-orden-id={orden.id}
+  >
     <a
       href="/admin/ordenes"
       class="text-sm mb-6 flex items-center gap-2 transition-colors hover:opacity-70 text-[#ff0000] hover:text-rust"
@@ -70,18 +74,16 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
       <ArrowLeft />
       Volver
     </a>
-    <div class="flex gap-2 items-center">
+    <div class="flex gap-2 items-center" id="estado-buttons">
       {
         siguientes.map((sig) => (
-          <form method="POST" action={`/api/admin/ordenes/${orden.id}/estado`}>
-            <input type="hidden" name="estado" value={sig} />
-            <button
-              type="submit"
-              class={`btn p-2 rounded text-[14px] ${sig === "cancelado" ? "bg-[#ff0000]" : "bg-emerald-500"}`}
-            >
-              {sig}
-            </button>
-          </form>
+          <button
+            type="button"
+            data-estado={sig}
+            class={`btn p-2 rounded text-[14px] ${sig === "cancelado" ? "bg-[#ff0000]" : "bg-emerald-500"}`}
+          >
+            {sig}
+          </button>
         ))
       }
     </div>
@@ -190,15 +192,11 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
       }
 
       <!-- Nota admin form -->
-      <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
+      <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]" id="nota-admin">
         <h3 class="text-xs tracking-[0.2em] mb-8 text-[#666666]">
           Agregar nota interna
         </h3>
-        <form
-          method="POST"
-          action={`/api/admin/ordenes/${orden.id}/nota`}
-          class="flex gap-2"
-        >
+        <form class="flex gap-2" id="nota-form">
           <textarea
             name="nota"
             class="input-field resize-y flex-1"
@@ -305,9 +303,8 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
             </div>
             {orden.datosEnvio.metodo !== "retiro" && (
               <form
-                method="POST"
-                action={`/api/admin/ordenes/${orden.id}/tracking`}
                 class="flex flex-col items-end gap-3 mt-3"
+                id="tracking-form"
               >
                 <input
                   type="text"
@@ -330,3 +327,67 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
     </div>
   </div>
 </AdminLayout>
+
+<script type="module">
+  import {
+    actualizarEstadoOrden,
+    guardarNotaOrden,
+    actualizarTrackingOrden,
+  } from "../../../lib/admin/api";
+
+  const header = document.getElementById("orden-header");
+  const ordenId = header?.dataset.ordenId;
+
+  if (ordenId) {
+    const estadoButtons = document.querySelectorAll(
+      "#estado-buttons [data-estado]",
+    );
+    estadoButtons.forEach((btn) => {
+      btn.addEventListener("click", async (event) => {
+        const target = event.currentTarget;
+        const estado = target && target.dataset ? target.dataset.estado : null;
+        if (!estado) return;
+        try {
+          await actualizarEstadoOrden(ordenId, estado);
+          window.location.reload();
+        } catch (error) {
+          alert("Error al actualizar el estado de la orden");
+        }
+      });
+    });
+
+    const notaForm = document.getElementById("nota-form");
+    if (notaForm) {
+      notaForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(notaForm);
+        const nota = (formData.get("nota") || "").toString().trim();
+        if (!nota) {
+          alert("La nota no puede estar vacía");
+          return;
+        }
+        try {
+          await guardarNotaOrden(ordenId, nota);
+          window.location.reload();
+        } catch (error) {
+          alert("Error al guardar la nota");
+        }
+      });
+    }
+
+    const trackingForm = document.getElementById("tracking-form");
+    if (trackingForm) {
+      trackingForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(trackingForm);
+        const trackingId = (formData.get("trackingId") || "").toString().trim();
+        try {
+          await actualizarTrackingOrden(ordenId, trackingId);
+          window.location.reload();
+        } catch (error) {
+          alert("Error al actualizar el tracking");
+        }
+      });
+    }
+  }
+</script>
