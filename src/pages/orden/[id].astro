@@ -177,6 +177,6 @@ const estadoUI = estados[status] ?? estados.pending;
   // Vaciar carrito si el pago fue exitoso
   const status = new URLSearchParams(window.location.search).get("status");
   if (status === "success") {
-    import("../store/carrito").then(({ vaciarCarrito }) => vaciarCarrito());
+    import("../../store/carrito").then(({ vaciarCarrito }) => vaciarCarrito());
   }
 </script>
