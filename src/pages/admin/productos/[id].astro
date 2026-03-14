@@ -41,12 +41,12 @@ const success = Astro.url.searchParams.get("success");
     )
   }
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <form
-      method="POST"
-      action={`/api/admin/productos/${esNuevo ? "crear" : producto?.id}`}
-      class="col-span-2"
-    >
+  <form
+    id="producto-form"
+    method="POST"
+    action={`/api/admin/productos/${esNuevo ? "crear" : producto?.id}`}
+  >
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Principal -->
       <div class="lg:col-span-2 space-y-6">
         <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
@@ -204,8 +204,7 @@ const success = Astro.url.searchParams.get("success");
                   />
                   <button
                     type="button"
-                    class="text-[#ff0000] hover:text-white hover:bg-[#ff0000] transition-colors p-2 border border-[#ff0000]"
-                    class="flex-shrink:0;"
+                    class="text-[#ff0000] hover:text-white hover:bg-[#ff0000] transition-colors p-2 border border-[#ff0000] flex-shrink:0 remove-variante"
                   >
                     ✕
                   </button>
@@ -221,160 +220,159 @@ const success = Astro.url.searchParams.get("success");
           />
         </div>
       </div>
-    </form>
 
-    <!-- Sidebar -->
-    <div class="flex flex-col gap-2">
-      <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
-        <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">Publicar</h3>
-        <div class="flex gap-2 mb-2">
-          <label class="flex items-center gap-1.5 text-[12px] cursor-pointer">
-            <input
-              type="checkbox"
-              name="activo"
-              value="true"
-              checked={producto?.activo ?? true}
-            />
-            Activo
-          </label>
-          <label class="flex items-center gap-1.5 text-[12px] cursor-pointer">
-            <input
-              type="checkbox"
-              name="destacado"
-              value="true"
-              checked={producto?.destacado ?? false}
-            />
-            Destacado
-          </label>
+      <!-- Sidebar -->
+      <div class="flex flex-col gap-2">
+        <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
+          <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">Publicar</h3>
+          <div class="flex gap-2 mb-2">
+            <label class="flex items-center gap-1.5 text-[12px] cursor-pointer">
+              <input
+                type="checkbox"
+                name="activo"
+                value="true"
+                checked={producto?.activo ?? true}
+              />
+              Activo
+            </label>
+            <label class="flex items-center gap-1.5 text-[12px] cursor-pointer">
+              <input
+                type="checkbox"
+                name="destacado"
+                value="true"
+                checked={producto?.destacado ?? false}
+              />
+              Destacado
+            </label>
+          </div>
+          <div class="flex gap-2 items-center">
+            <button
+              type="submit"
+              class="btn-primary bg-[#ff0000] w-full"
+            >
+              {esNuevo ? "Crear producto" : "Guardar cambios"}
+            </button>
+            {
+              !esNuevo && (
+                <a
+                  href={`/productos/${producto?.slug}`}
+                  target="_blank"
+                  class="w-full mt-2 hover:text-rust"
+                >
+                  Ver en tienda →
+                </a>
+              )
+            }
+          </div>
         </div>
-        <div class="flex gap-2 items-center">
-          <button
-            type="submit"
-            class="btn-primary bg-[#ff0000] w-full"
-            
-          >
-            {esNuevo ? "Crear producto" : "Guardar cambios"}
-          </button>
-          {
-            !esNuevo && (
-              <a
-                href={`/productos/${producto?.slug}`}
-                target="_blank"
-                class="w-full mt-2 hover:text-rust"
-              >
-                Ver en tienda →
-              </a>
-            )
-          }
-        </div>
-      </div>
 
-      <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
-        <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">Detalles</h3>
-        <div class="flex flex-col gap-2.5">
-          <div>
-            <label
-              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
-              >Categoría</label
-            >
-            <select name="categoriaId" class="input-field">
-              <option value="">Sin categoría</option>
-              {
-                cats.map((cat) => (
-                  <option
-                    value={cat.id}
-                    selected={producto?.categoriaId === cat.id}
-                  >
-                    {cat.nombre}
-                  </option>
-                ))
-              }
-            </select>
-          </div>
-          <div>
-            <label
-              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
-              >Precio *</label
-            >
-            <input
-              name="precio"
-              type="number"
-              min="0"
-              step="0.01"
-              class="input-field"
-              required
-              value={producto?.precio ?? ""}
-              placeholder="12500"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
-            >
-              Precio original (tachado)
-            </label>
-            <input
-              name="precioOriginal"
-              type="number"
-              min="0"
-              step="0.01"
-              class="input-field"
-              value={producto?.precioOriginal ?? ""}
-              placeholder="15000"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
-            >
-              Género
-            </label>
-            <select name="genero" class="input-field">
-              <option value="">Sin especificar</option>
-              <option value="mujer" selected={producto?.genero === "mujer"}
-                >Mujer</option
+        <div class="rounded p-6 bg-[#0a0a0a] border border-[#1a1a1a]">
+          <h3 class="text-xs tracking-[0.2em] mb-6 text-[#666666]">Detalles</h3>
+          <div class="flex flex-col gap-2.5">
+            <div>
+              <label
+                class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
+                >Categoría</label
               >
-              <option value="hombre" selected={producto?.genero === "hombre"}
-                >Hombre</option
+              <select name="categoriaId" class="input-field">
+                <option value="">Sin categoría</option>
+                {
+                  cats.map((cat) => (
+                    <option
+                      value={cat.id}
+                      selected={producto?.categoriaId === cat.id}
+                    >
+                      {cat.nombre}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
+                >Precio *</label
               >
-              <option value="unisex" selected={producto?.genero === "unisex"}
-                >Unisex</option
+              <input
+                name="precio"
+                type="number"
+                min="0"
+                step="0.01"
+                class="input-field"
+                required
+                value={producto?.precio ?? ""}
+                placeholder="12500"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
               >
-            </select>
-          </div>
-          <div>
-            <label
-              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
-              >Material
-            </label>
-            <input
-              name="material"
-              type="text"
-              class="input-field"
-              value={producto?.material ?? ""}
-              placeholder="Algodón 100%"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
-            >
-              Peso (kg)
-            </label>
-            <input
-              name="peso"
-              type="number"
-              min="0"
-              step="0.001"
-              class="input-field"
-              value={producto?.peso ?? ""}
-              placeholder="0.250"
-            />
+                Precio original (tachado)
+              </label>
+              <input
+                name="precioOriginal"
+                type="number"
+                min="0"
+                step="0.01"
+                class="input-field"
+                value={producto?.precioOriginal ?? ""}
+                placeholder="15000"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
+              >
+                Género
+              </label>
+              <select name="genero" class="input-field">
+                <option value="">Sin especificar</option>
+                <option value="mujer" selected={producto?.genero === "mujer"}
+                  >Mujer</option
+                >
+                <option value="hombre" selected={producto?.genero === "hombre"}
+                  >Hombre</option
+                >
+                <option value="unisex" selected={producto?.genero === "unisex"}
+                  >Unisex</option
+                >
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
+                >Material
+              </label>
+              <input
+                name="material"
+                type="text"
+                class="input-field"
+                value={producto?.material ?? ""}
+                placeholder="Algodón 100%"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-[10px] text-[#555] uppercase leading-[0.1em] mb-1"
+              >
+                Peso (kg)
+              </label>
+              <input
+                name="peso"
+                type="number"
+                min="0"
+                step="0.001"
+                class="input-field"
+                value={producto?.peso ?? ""}
+                placeholder="0.250"
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </form>
 </AdminLayout>
 
 <script>
@@ -398,7 +396,7 @@ const success = Astro.url.searchParams.get("success");
       <input name="v_sku_${count}" class="input-field" placeholder="SKU" />
       <input name="v_extra_${count}" class="input-field" type="number" min="0" value="0" />
       <input type="hidden" name="v_id_${count}" value="" />
-      <button type="button" class="text-[#ff0000] hover:text-white hover:bg-[#ff0000] transition-colors p-2 border border-[#ff0000]">✕</button>
+      <button type="button" class="text-[#ff0000] hover:text-white hover:bg-[#ff0000] transition-colors p-2 border border-[#ff0000] remove-variante">✕</button>
     `;
     container.appendChild(row);
     count++;

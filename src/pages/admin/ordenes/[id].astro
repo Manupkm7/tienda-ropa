@@ -76,15 +76,22 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
     </a>
     <div class="flex gap-2 items-center" id="estado-buttons">
       {
-        siguientes.map((sig) => (
-          <button
-            type="button"
-            data-estado={sig}
-            class={`btn p-2 rounded text-[14px] ${sig === "cancelado" ? "bg-[#ff0000]" : "bg-emerald-500"}`}
-          >
-            {sig}
-          </button>
-        ))
+        siguientes.map((sig) => {
+          const esCanceladoDeshabilitado =
+            orden.estado === "pagado" && sig === "cancelado";
+          return (
+            <button
+              type="button"
+              data-estado={sig}
+              disabled={esCanceladoDeshabilitado}
+              class={`btn p-2 rounded text-[14px] ${
+                sig === "cancelado" ? "bg-[#ff0000]" : "bg-emerald-500"
+              } ${esCanceladoDeshabilitado ? "opacity-40 cursor-not-allowed" : ""}`}
+            >
+              {sig}
+            </button>
+          );
+        })
       }
     </div>
   </div>
@@ -328,15 +335,46 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
   </div>
 </AdminLayout>
 
-<script type="module">
-  import {
-    actualizarEstadoOrden,
-    guardarNotaOrden,
-    actualizarTrackingOrden,
-  } from "../../../lib/admin/api";
-
+<script>
+  // @ts-nocheck
   const header = document.getElementById("orden-header");
   const ordenId = header?.dataset.ordenId;
+
+  async function actualizarEstadoOrden(id: string, estado: string) {
+    const formData = new FormData();
+    formData.set("estado", estado);
+    const res = await fetch(`/api/admin/ordenes/${id}/estado`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) {
+      throw new Error("No se pudo actualizar el estado");
+    }
+  }
+
+  async function guardarNotaOrden(id: string, nota: string) {
+    const formData = new FormData();
+    formData.set("nota", nota);
+    const res = await fetch(`/api/admin/ordenes/${id}/nota`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) {
+      throw new Error("No se pudo guardar la nota");
+    }
+  }
+
+  async function actualizarTrackingOrden(id: string, trackingId: string) {
+    const formData = new FormData();
+    formData.set("trackingId", trackingId);
+    const res = await fetch(`/api/admin/ordenes/${id}/tracking`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) {
+      throw new Error("No se pudo actualizar el tracking");
+    }
+  }
 
   if (ordenId) {
     const estadoButtons = document.querySelectorAll(
@@ -344,8 +382,8 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
     );
     estadoButtons.forEach((btn) => {
       btn.addEventListener("click", async (event) => {
-        const target = event.currentTarget;
-        const estado = target && target.dataset ? target.dataset.estado : null;
+        const target = event.currentTarget as HTMLElement;
+        const estado = target.dataset.estado ?? null;
         if (!estado) return;
         try {
           await actualizarEstadoOrden(ordenId, estado);
@@ -356,11 +394,11 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
       });
     });
 
-    const notaForm = document.getElementById("nota-form");
-    if (notaForm) {
-      notaForm.addEventListener("submit", async (event) => {
+    const notaFormEl = document.getElementById("nota-form");
+    if (notaFormEl instanceof HTMLFormElement) {
+      notaFormEl.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const formData = new FormData(notaForm);
+        const formData = new FormData(notaFormEl);
         const nota = (formData.get("nota") || "").toString().trim();
         if (!nota) {
           alert("La nota no puede estar vacía");
@@ -375,11 +413,11 @@ const siguientes = ESTADOS_SIGUIENTES[orden.estado] ?? [];
       });
     }
 
-    const trackingForm = document.getElementById("tracking-form");
-    if (trackingForm) {
-      trackingForm.addEventListener("submit", async (event) => {
+    const trackingFormEl = document.getElementById("tracking-form");
+    if (trackingFormEl instanceof HTMLFormElement) {
+      trackingFormEl.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const formData = new FormData(trackingForm);
+        const formData = new FormData(trackingFormEl);
         const trackingId = (formData.get("trackingId") || "").toString().trim();
         try {
           await actualizarTrackingOrden(ordenId, trackingId);

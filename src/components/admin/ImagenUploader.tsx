@@ -29,21 +29,23 @@ interface EstadoSubida {
 }
 
 export default function ImagenUploader({ value = [], onChange, hiddenInputId, productoSlug, max = 6 }: Props) {
+  const [urls, setUrls] = useState<string[]>(value ?? []);
   const [subiendo, setSubiendo] = useState<EstadoSubida[]>([]);
   const [arrastrando, setArrastrando] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const notifyChange = useCallback((urls: string[]) => {
-    onChange?.(urls);
+  const notifyChange = useCallback((nuevas: string[]) => {
+    setUrls(nuevas);
+    onChange?.(nuevas);
     if (hiddenInputId) {
       const el = document.getElementById(hiddenInputId);
-      if (el && 'value' in el) (el as HTMLInputElement).value = JSON.stringify(urls);
+      if (el && 'value' in el) (el as HTMLInputElement).value = JSON.stringify(nuevas);
     }
   }, [onChange, hiddenInputId]);
 
   const subirArchivos = useCallback(async (files: FileList | File[]) => {
     const lista = Array.from(files).filter(f => f.type.startsWith('image/'));
-    const disponibles = max - value.length;
+    const disponibles = max - urls.length;
     const aSubir = lista.slice(0, disponibles);
 
     if (aSubir.length === 0) return;
@@ -57,8 +59,10 @@ export default function ImagenUploader({ value = [], onChange, hiddenInputId, pr
 
     setSubiendo(prev => [...prev, ...nuevosEstados]);
 
-    // Subir en paralelo
-    await Promise.all(aSubir.map(async (file, i) => {
+    // Subir secuencialmente para evitar problemas de estado obsoleto
+    let acumuladas = [...urls];
+    for (let i = 0; i < aSubir.length; i++) {
+      const file = aSubir[i];
       const id = nuevosEstados[i].id;
       const form = new FormData();
       form.append('file', file);
@@ -92,7 +96,8 @@ export default function ImagenUploader({ value = [], onChange, hiddenInputId, pr
         ));
 
         // Agregar URL al listado
-        notifyChange([...value, data.url]);
+        acumuladas = [...acumuladas, data.url];
+        notifyChange(acumuladas);
 
         // Limpiar estado después de 1 segundo
         setTimeout(() => {
@@ -104,8 +109,8 @@ export default function ImagenUploader({ value = [], onChange, hiddenInputId, pr
           s.id === id ? { ...s, error: err instanceof Error ? err.message : 'Error' } : s
         ));
       }
-    }));
-  }, [value, notifyChange, productoSlug, max]);
+    }
+  }, [urls, notifyChange, productoSlug, max]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -120,7 +125,7 @@ export default function ImagenUploader({ value = [], onChange, hiddenInputId, pr
       ? url.split('/storage/v1/object/public/productos/').at(-1)
       : url;
 
-    notifyChange(value.filter((_, i) => i !== index));
+    notifyChange(urls.filter((_, i) => i !== index));
 
     // Eliminar de Supabase Storage en background (best effort)
     if (path && path !== url) {
@@ -133,21 +138,21 @@ export default function ImagenUploader({ value = [], onChange, hiddenInputId, pr
   };
 
   const moverImagen = (from: number, to: number) => {
-    const next = [...value];
+    const next = [...urls];
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
     notifyChange(next);
   };
 
-  const hayLugar = value.length + subiendo.filter(s => !s.error && !s.url).length < max;
+  const hayLugar = urls.length + subiendo.filter(s => !s.error && !s.url).length < max;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
       {/* Grid de imágenes existentes */}
-      {value.length > 0 && (
+      {urls.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
-          {value.map((url, i) => (
+          {urls.map((url, i) => (
             <div
               key={url}
               draggable
@@ -267,7 +272,7 @@ export default function ImagenUploader({ value = [], onChange, hiddenInputId, pr
             }
           </p>
           <p style={{ fontSize: 10, color: '#333', margin: 0 }}>
-            JPEG, PNG, WebP o AVIF · máx. 8 MB · {value.length}/{max} imágenes · Supabase Storage
+            JPEG, PNG, WebP o AVIF · máx. 8 MB · {urls.length}/{max} imágenes · Supabase Storage
           </p>
           <input
             ref={inputRef}

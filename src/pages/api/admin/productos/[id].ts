@@ -83,12 +83,13 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
   try {
     const form = await request.formData();
-    const { params } = request as any;
-    const idParam = new URL(request.url).pathname.split('/').at(-2);
+    const url = new URL(request.url);
+    const segmentos = url.pathname.split('/').filter(Boolean);
+    const idParam = segmentos.at(-1);
 
     if (idParam === 'crear') {
-      const prodId = await procesarProducto(form);
-      return redirect(`/admin/productos/${prodId}?success=1`);
+      await procesarProducto(form);
+      return redirect(`/admin/productos?success=1`);
     } else {
       const productoId = parseInt(idParam!);
       await procesarProducto(form, productoId);

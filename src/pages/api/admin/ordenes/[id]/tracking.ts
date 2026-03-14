@@ -4,18 +4,18 @@ import { ordenes, type Orden } from '../../../../../lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { getAdminFromCookies } from '../../../../../lib/auth';
 
-export const POST: APIRoute = async ({ params, request, cookies, redirect }) => {
+export const POST: APIRoute = async ({ params, request, cookies }) => {
   const admin = await getAdminFromCookies(cookies);
   if (!admin) return new Response('Unauthorized', { status: 401 });
 
   const { id } = params;
-  if (!id) return redirect('/admin/ordenes');
+  if (!id) return new Response('Missing id', { status: 400 });
 
   const form = await request.formData();
   const trackingId = form.get('trackingId')?.toString().trim();
 
   const orden = await db.query.ordenes.findFirst({ where: eq(ordenes.id, id) });
-  if (!orden) return redirect('/admin/ordenes');
+  if (!orden) return new Response('Orden no encontrada', { status: 404 });
 
   if (!orden.datosEnvio) {
     return new Response('La orden no tiene datos de envío', { status: 400 });
@@ -32,5 +32,8 @@ export const POST: APIRoute = async ({ params, request, cookies, redirect }) => 
     .set({ datosEnvio: datosEnvioActualizado, actualizadoEn: new Date() })
     .where(eq(ordenes.id, id));
 
-  return redirect(`/admin/ordenes/${id}?success=tracking`);
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
 };
