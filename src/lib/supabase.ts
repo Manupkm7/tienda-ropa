@@ -60,7 +60,7 @@ export async function subirImagen(
     throw new Error(`El archivo supera el límite de 8 MB (${(file.size / 1024 / 1024).toFixed(1)} MB)`);
   }
 
-  const carpeta    = opts.carpeta ?? 'productos';
+  const carpeta    = opts.carpeta ?? 'products';
   const timestamp  = Date.now();
   const ext        = file.type.split('/')[1].replace('jpeg', 'jpg');
   const nombreBase = file.name
