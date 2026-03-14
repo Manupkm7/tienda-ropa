@@ -119,7 +119,8 @@ const currentPath = Astro.url.pathname;
         {
           nav.map(({ href, label, icon }) => {
             const Icon = icon;
-            const isActive = currentPath === href;
+            const isActive =
+              currentPath === href || currentPath.startsWith(href + "/");
             return (
               <a
                 href={href}

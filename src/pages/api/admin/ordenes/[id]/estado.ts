@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
-import { db } from '../../../../lib/db';
-import { ordenes } from '../../../../lib/db/schema';
+import { db } from '../../../../../lib/db';
+import { ordenes } from '../../../../../lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { getAdminFromCookies } from '../../../../lib/auth';
+import { getAdminFromCookies } from '../../../../../lib/auth';
 
 const ESTADOS_VALIDOS = ['pendiente', 'pagado', 'procesando', 'empaquetado', 'enviado', 'entregado', 'cancelado', 'reembolsado'];
 

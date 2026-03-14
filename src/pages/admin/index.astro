@@ -240,7 +240,12 @@ const getStatusColor = (status: string) => {
               </td>
               <td class="px-4 py-4 text-sm">{fmtFecha(order.creadoEn)}</td>
               <td class="px-4 py-4">
-                <a href={`/admin/productos/${order.id}`} rel="noreferrer" target="_blank" class="text-xs flex items-center gap-1 transition-colors hover:opacity-70 text-[#ff0000] hover:text-rust">
+                <a
+                  href={`/admin/ordenes/${order.id}`}
+                  rel="noreferrer"
+                  target="_blank"
+                  class="text-xs flex items-center gap-1 transition-colors hover:opacity-70 text-[#ff0000] hover:text-rust"
+                >
                   Ver <span>→</span>
                 </a>
               </td>

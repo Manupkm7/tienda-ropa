@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getClienteFromCookies, verifyPassword, hashPassword, USER_SESSION_COOKIE } from '../../../lib/userAuth';
+import { getClienteFromCookies, verifyPassword, hashPassword } from '../../../lib/userAuth';
 import { db } from '../../../lib/db';
 import { clientes } from '../../../lib/db/schema';
 import { eq } from 'drizzle-orm';

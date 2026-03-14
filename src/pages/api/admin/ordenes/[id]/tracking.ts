@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { db } from '../../../../../lib/db';
-import { ordenes } from '../../../../../lib/db/schema';
+import { ordenes, type Orden } from '../../../../../lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { getAdminFromCookies } from '../../../../../lib/auth';
 
@@ -17,7 +17,13 @@ export const POST: APIRoute = async ({ params, request, cookies, redirect }) => 
   const orden = await db.query.ordenes.findFirst({ where: eq(ordenes.id, id) });
   if (!orden) return redirect('/admin/ordenes');
 
-  const datosEnvioActualizado = {
+  if (!orden.datosEnvio) {
+    return new Response('La orden no tiene datos de envío', { status: 400 });
+  }
+
+  type DatosEnvio = NonNullable<Orden['datosEnvio']>;
+
+  const datosEnvioActualizado: DatosEnvio = {
     ...orden.datosEnvio,
     trackingId: trackingId || undefined,
   };

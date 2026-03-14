@@ -1,6 +1,6 @@
 import { db } from './db';
 import { productos, variantes, categorias } from './db/schema';
-import { eq, and, or, gte, lte, ilike, inArray, sql, desc, asc } from 'drizzle-orm';
+import { eq, and, or, gte, lte, ilike, sql, desc, asc } from 'drizzle-orm';
 import type { ProductoConVariantes } from './db/schema';
 
 export interface FiltrosProducto {
