@@ -22,7 +22,7 @@ export const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
 });
 
 // Bucket donde se guardan las imágenes de productos
-export const BUCKET = 'productos';
+export const BUCKET = 'products';
 
 // Tipos MIME permitidos
 const TIPOS_PERMITIDOS = new Set([
